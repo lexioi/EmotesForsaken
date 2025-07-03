@@ -1,0 +1,300 @@
+-- Script by lexioi
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- Player and Character Variables (will be set dynamically)
+local player = Players.LocalPlayer
+print("DEBUG: LocalPlayer:", player.Name)
+
+local character: Model? = nil
+local humanoid: Humanoid? = nil
+local originalJumpPower = 50
+
+-- Assets
+local assetsFolder = ReplicatedStorage:WaitForChild("Assets")
+local emotesFolder = assetsFolder:WaitForChild("Emotes")
+
+-- State Management
+-- Store active animation tracks and sounds for the LOCAL player's humanoid only.
+local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack?, sound: Sound?, stoppedConnection: RBXScriptConnection?}} = {}
+local isMovementDisabled: boolean = false
+
+-- GUI Creation
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "EmoteGui"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenButton"
+openButton.Parent = screenGui
+openButton.Size = UDim2.new(0, 150, 0, 50)
+openButton.Position = UDim2.new(0.5, -75, 0.8, 0)
+openButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+openButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+openButton.Text = "Open Emotes"
+openButton.Font = Enum.Font.SourceSansBold
+openButton.TextSize = 20
+openButton.Active = true
+openButton.Draggable = true
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "EmoteMenu"
+mainFrame.Parent = screenGui
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Visible = false
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Parent = mainFrame
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Text = "Emotes"
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 24
+
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Name = "Container"
+scrollingFrame.Parent = mainFrame
+scrollingFrame.Size = UDim2.new(1, 0, 1, -40)
+scrollingFrame.Position = UDim2.new(0, 0, 0, 40)
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+scrollingFrame.BorderSizePixel = 0
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Parent = scrollingFrame
+uiListLayout.Padding = UDim.new(0, 5)
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Function to reset player movement to default
+local function resetPlayerMovement()
+    if humanoid and isMovementDisabled then
+        humanoid.WalkSpeed = 16
+        humanoid.JumpPower = originalJumpPower
+        isMovementDisabled = false
+    end
+end
+
+-- Function to stop a specific emote for a given humanoid (only used for local player now)
+local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
+    local emoteData = activeEmotes[targetHumanoid]
+    if emoteData then
+        if emoteData.animationTrack then
+            emoteData.animationTrack:Stop()
+            if emoteData.stoppedConnection then
+                emoteData.stoppedConnection:Disconnect()
+                emoteData.stoppedConnection = nil
+            end
+        end
+        if emoteData.sound then
+            emoteData.sound:Stop()
+            emoteData.sound:Destroy() -- Clean up the sound instance
+        end
+        activeEmotes[targetHumanoid] = nil
+    end
+end
+
+-- Function to stop all currently playing emotes and reset player state
+local function stopAllEmotes()
+    -- Останавливаем эмоции только для текущего humanoid
+    if humanoid then
+        stopEmoteForHumanoid(humanoid) 
+    end
+    activeEmotes = {}
+    resetPlayerMovement()
+end
+
+-- Local function to play animation (client-side only for instant feedback)
+local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetID: string, DisplayName: string?, SFX: string?, SFXProperties: {Looped: boolean?}, SyncMusic: boolean?, SyncAnim: boolean?}, characterModel: Model)
+    -- Останавливаем любую активную эмоцию на этом гуманоиде перед началом новой
+    stopEmoteForHumanoid(targetHumanoid)
+
+    -- --- ГЛАВНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ: Анимация проигрывается СРАЗУ ---
+    local animation = Instance.new("Animation")
+    animation.AnimationId = emoteConfig.AssetID
+    local animationTrack = targetHumanoid:LoadAnimation(animation)
+    animationTrack:Play()
+    ------------------------------------------------------------------
+
+    -- Сохраняем данные активной эмоции для этого гуманоида (локального игрока)
+    activeEmotes[targetHumanoid] = {animationTrack = animationTrack}
+
+    -- --- ДАЛЕЕ ИДЕТ ТОЛЬКО ЛОГИКА ДЛЯ ЗВУКА, которая не блокирует анимацию ---
+    local soundAttachmentPart = nil
+    -- Пробуем найти часть для звука только если SFX существует и characterModel доступен
+    if emoteConfig.SFX and characterModel then
+        print("DEBUG: Attempting to find sound attachment part for characterModel:", characterModel.Name)
+        
+        -- Сначала пытаемся найти HumanoidRootPart с увеличенным таймаутом
+        -- Используем pcall, чтобы предотвратить ошибку, если WaitForChild зависнет или вернет nil
+        local success, rootPartResult = pcall(function() 
+            return characterModel:WaitForChild("HumanoidRootPart", 10) 
+        end)
+        
+        if success and rootPartResult then
+            soundAttachmentPart = rootPartResult
+            print("DEBUG: Successfully found HumanoidRootPart for", characterModel.Name)
+        else
+            warn(string.format("DEBUG: HumanoidRootPart NOT found for model '%s' within 10 seconds! Attempting alternative (UpperTorso/Torso). For emote '%s'", characterModel.Name, emoteConfig.DisplayName or emoteConfig.AssetID))
+            -- Если HumanoidRootPart не найден за 10 секунд, пробуем UpperTorso, затем Torso
+            soundAttachmentPart = characterModel:FindFirstChild("UpperTorso") or characterModel:FindFirstChild("Torso")
+            if soundAttachmentPart then
+                print(string.format("DEBUG: Successfully found alternative sound attachment part (%s) for %s.", soundAttachmentPart.Name, characterModel.Name))
+            else
+                warn(string.format("DEBUG: Neither HumanoidRootPart, UpperTorso, nor Torso found for model '%s'! Sound will not play for emote '%s'", characterModel.Name, emoteConfig.DisplayName or emoteConfig.AssetID))
+            end
+        end
+    elseif emoteConfig.SFX and not characterModel then
+        warn("DEBUG: characterModel is NIL when trying to play sound for emote:", emoteConfig.DisplayName or emoteConfig.AssetID)
+    end
+
+    if emoteConfig.SFX and soundAttachmentPart then
+        local sound = Instance.new("Sound")
+        sound.SoundId = emoteConfig.SFX
+        sound.Parent = soundAttachmentPart
+        if emoteConfig.SFXProperties and emoteConfig.SFXProperties.Looped then
+            sound.Looped = true
+        end
+        sound:Play()
+        activeEmotes[targetHumanoid].sound = sound
+    elseif emoteConfig.SFX then
+        warn(string.format("DEBUG: Sound for emote '%s' could not be played because no valid attachment part was found.", emoteConfig.DisplayName or emoteConfig.AssetID))
+    end
+    -------------------------------------------------------------------
+
+    -- Подключаемся к событию 'Stopped' анимации, чтобы автоматически остановить эмоцию
+    activeEmotes[targetHumanoid].stoppedConnection = animationTrack.Stopped:Connect(function()
+        task.wait() -- Небольшая задержка, чтобы убедиться, что это не сработает при ручной остановке
+        if activeEmotes[targetHumanoid] and activeEmotes[targetHumanoid].animationTrack == animationTrack then
+            stopEmoteForHumanoid(targetHumanoid)
+        end
+    end)
+end
+
+-- Функция создания кнопок для всех доступных эмоций
+local function createEmoteButtons()
+    for _, emoteConfig in pairs(emotesFolder:GetChildren()) do
+        if emoteConfig:IsA("ModuleScript") then
+            local success, emoteData = pcall(require, emoteConfig)
+            if success and emoteData.AssetID then
+                local button = Instance.new("TextButton")
+                button.Name = emoteConfig.Name .. "Button"
+                button.Parent = scrollingFrame
+                button.Size = UDim2.new(1, -10, 0, 40)
+                button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+                button.TextColor3 = Color3.fromRGB(255, 255, 255)
+                button.Text = emoteData.DisplayName or emoteData.AssetID
+                button.Font = Enum.Font.SourceSansBold
+                button.TextSize = 18
+
+                button.MouseButton1Click:Connect(function()
+                    if humanoid and character then
+                        playLocalAnimation(humanoid, emoteData, character)
+                    else
+                        warn("DEBUG: Cannot play emote, humanoid or character is nil.")
+                    end
+                end)
+            else
+                warn("DEBUG: Failed to require emote module:", emoteConfig.Name)
+            end
+        end
+    end
+
+    -- Обновляем CanvasSize для ScrollingFrame
+    task.wait(0.1)
+    local contentSize = uiListLayout.AbsoluteContentSize
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+end
+
+-- Функция переключения видимости меню эмоций
+local function toggleMenu()
+    mainFrame.Visible = not mainFrame.Visible
+    openButton.Text = mainFrame.Visible and "Close Emotes" or "Open Emotes"
+end
+
+-- Подключаем кнопку открытия меню
+openButton.MouseButton1Click:Connect(toggleMenu)
+
+-- Обработка обновления персонажа игрока
+local function setupHumanoidConnections(targetHumanoid: Humanoid)
+    -- Следим за WalkSpeed и JumpPower для возможных корректировок, если нужно
+    -- Например, можно восстановить значение после эмоций, если мы их отключили
+    -- (Не обязательно в данном скрипте, так как мы явно сбрасываем их в resetPlayerMovement)
+end
+
+local function handleCharacterSetup(newCharacter: Model)
+    print("DEBUG: Character loaded:", newCharacter.Name)
+    -- Ждём появления humanoid
+    local success, newHumanoid = pcall(function()
+        return newCharacter:WaitForChild("Humanoid", 10)
+    end)
+    if success and newHumanoid then
+        humanoid = newHumanoid
+        originalJumpPower = humanoid.JumpPower or 50 -- сохраняем оригинальный JumpPower
+        print("DEBUG: Player Humanoid found for new character:", humanoid.Name)
+        setupHumanoidConnections(humanoid)
+        stopAllEmotes()
+    else
+        humanoid = nil
+        warn("DEBUG: Humanoid not found in new character model:", newCharacter.Name, "after 10 seconds.")
+    end
+end
+
+-- Слушаем смену персонажа
+player.CharacterAdded:Connect(function(char)
+    character = char
+    handleCharacterSetup(char)
+end)
+
+if player.Character then
+    character = player.Character
+    handleCharacterSetup(character)
+end
+
+-- Остановить все эмоции по нажатию пробела и заблокировать прыжок
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+
+    if input.KeyCode == Enum.KeyCode.Space then
+        -- Останавливаем эмоции и блокируем прыжок
+        stopAllEmotes()
+
+        if humanoid then
+            originalJumpPower = humanoid.JumpPower or 50
+            humanoid.JumpPower = 0
+            humanoid.Jump = false
+        end
+    elseif input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.ButtonA then
+        stopAllEmotes()
+    elseif input.UserInputType == Enum.UserInputType.Touch then
+        stopAllEmotes()
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+
+    if input.KeyCode == Enum.KeyCode.Space then
+        -- Восстанавливаем прыжок после отпускания пробела
+        if humanoid then
+            humanoid.JumpPower = originalJumpPower
+        end
+    end
+end)
+
+-- Инициализация кнопок эмоций
+createEmoteButtons()
+
+print("DEBUG: Emote script loaded successfully.")
