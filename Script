@@ -1,8 +1,9 @@
--- Script by lexioi
+-- Script by lexioi (Modified and Fixed for table AssetID/SFX)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService") -- Not strictly used in this snippet, but kept if you expand functionality
 
 -- Player and Character Variables (will be set dynamically)
 local player = Players.LocalPlayer
@@ -19,7 +20,7 @@ local emotesFolder = assetsFolder:WaitForChild("Emotes")
 -- State Management
 -- Store active animation tracks and sounds for the LOCAL player's humanoid only.
 local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack?, sound: Sound?, stoppedConnection: RBXScriptConnection?}} = {}
-local isMovementDisabled: boolean = false
+local isMovementDisabled: boolean = false -- This variable seems unused in the current script based on the logic to reset movement.
 
 -- GUI Creation
 local screenGui = Instance.new("ScreenGui")
@@ -116,13 +117,30 @@ local function stopAllEmotes()
 end
 
 -- Local function to play animation (client-side only for instant feedback)
-local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetID: string, DisplayName: string?, SFX: string?, SFXProperties: {Looped: boolean?}, SyncMusic: boolean?, SyncAnim: boolean?}, characterModel: Model)
+local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetID: any, DisplayName: string?, SFX: any, SFXProperties: {Looped: boolean?}, SyncMusic: boolean?, SyncAnim: boolean?}, characterModel: Model)
     -- Останавливаем любую активную эмоцию на этом гуманоиде перед началом новой
     stopEmoteForHumanoid(targetHumanoid)
 
-    -- --- ГЛАВНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ: Анимация проигрывается СРАЗУ ---
+    local animationIdToPlay: string
+    if type(emoteConfig.AssetID) == "table" then
+        -- If AssetID is a table, pick a random one
+        if #emoteConfig.AssetID > 0 then
+            animationIdToPlay = emoteConfig.AssetID[math.random(1, #emoteConfig.AssetID)]
+            print("DEBUG: Randomly selected AnimationId (from table):", animationIdToPlay)
+        else
+            warn("DEBUG: emoteConfig.AssetID is an empty table. Cannot play animation.")
+            return -- Exit if no animation IDs are provided
+        end
+    elseif type(emoteConfig.AssetID) == "string" then
+        animationIdToPlay = emoteConfig.AssetID
+        print("DEBUG: Using AnimationId (from string):", animationIdToPlay)
+    else
+        warn("DEBUG: Invalid type for emoteConfig.AssetID. Expected string or table, got", type(emoteConfig.AssetID))
+        return -- Exit if AssetID is neither string nor table
+    end
+
     local animation = Instance.new("Animation")
-    animation.AnimationId = emoteConfig.AssetID
+    animation.AnimationId = animationIdToPlay
     local animationTrack = targetHumanoid:LoadAnimation(animation)
     animationTrack:Play()
     ------------------------------------------------------------------
@@ -136,40 +154,68 @@ local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetI
     if emoteConfig.SFX and characterModel then
         print("DEBUG: Attempting to find sound attachment part for characterModel:", characterModel.Name)
         
-        -- Сначала пытаемся найти HumanoidRootPart с увеличенным таймаутом
-        -- Используем pcall, чтобы предотвратить ошибку, если WaitForChild зависнет или вернет nil
-        local success, rootPartResult = pcall(function() 
-            return characterModel:WaitForChild("HumanoidRootPart", 10) 
-        end)
-        
-        if success and rootPartResult then
-            soundAttachmentPart = rootPartResult
-            print("DEBUG: Successfully found HumanoidRootPart for", characterModel.Name)
-        else
-            warn(string.format("DEBUG: HumanoidRootPart NOT found for model '%s' within 10 seconds! Attempting alternative (UpperTorso/Torso). For emote '%s'", characterModel.Name, emoteConfig.DisplayName or emoteConfig.AssetID))
-            -- Если HumanoidRootPart не найден за 10 секунд, пробуем UpperTorso, затем Torso
-            soundAttachmentPart = characterModel:FindFirstChild("UpperTorso") or characterModel:FindFirstChild("Torso")
-            if soundAttachmentPart then
-                print(string.format("DEBUG: Successfully found alternative sound attachment part (%s) for %s.", soundAttachmentPart.Name, characterModel.Name))
+        local chosenSfxId: string
+        if type(emoteConfig.SFX) == "table" then
+            if #emoteConfig.SFX > 0 then
+                chosenSfxId = emoteConfig.SFX[math.random(1, #emoteConfig.SFX)]
+                print("DEBUG: Randomly selected SFXId (from table):", chosenSfxId)
             else
-                warn(string.format("DEBUG: Neither HumanoidRootPart, UpperTorso, nor Torso found for model '%s'! Sound will not play for emote '%s'", characterModel.Name, emoteConfig.DisplayName or emoteConfig.AssetID))
+                warn("DEBUG: emoteConfig.SFX is an empty table. Sound will not play.")
+            end
+        elseif type(emoteConfig.SFX) == "string" then
+            chosenSfxId = emoteConfig.SFX
+            print("DEBUG: Using SFXId (from string):", chosenSfxId)
+        else
+            warn("DEBUG: Invalid type for emoteConfig.SFX. Expected string or table, got", type(emoteConfig.SFX))
+        end
+
+        if chosenSfxId then -- Only proceed if a valid SFX ID was found
+            -- Сначала пытаемся найти HumanoidRootPart с увеличенным таймаутом
+            -- Используем pcall, чтобы предотвратить ошибку, если WaitForChild зависнет или вернет nil
+            local success, rootPartResult = pcall(function() 
+                return characterModel:WaitForChild("HumanoidRootPart", 10) 
+            end)
+            
+            if success and rootPartResult then
+                soundAttachmentPart = rootPartResult
+                print("DEBUG: Successfully found HumanoidRootPart for", characterModel.Name)
+            else
+                warn(string.format("DEBUG: HumanoidRootPart NOT found for model '%s' within 10 seconds! Attempting alternative (UpperTorso/Torso). For emote '%s'", characterModel.Name, emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
+                -- Если HumanoidRootPart не найден за 10 секунд, пробуем UpperTorso, затем Torso
+                soundAttachmentPart = characterModel:FindFirstChild("UpperTorso") or characterModel:FindFirstChild("Torso")
+                if soundAttachmentPart then
+                    print(string.format("DEBUG: Successfully found alternative sound attachment part (%s) for %s.", soundAttachmentPart.Name, characterModel.Name))
+                else
+                    warn(string.format("DEBUG: Neither HumanoidRootPart, UpperTorso, nor Torso found for model '%s'! Sound will not play for emote '%s'", characterModel.Name, emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
+                end
             end
         end
-    elseif emoteConfig.SFX and not characterModel then
-        warn("DEBUG: characterModel is NIL when trying to play sound for emote:", emoteConfig.DisplayName or emoteConfig.AssetID)
-    end
-
-    if emoteConfig.SFX and soundAttachmentPart then
-        local sound = Instance.new("Sound")
-        sound.SoundId = emoteConfig.SFX
-        sound.Parent = soundAttachmentPart
-        if emoteConfig.SFXProperties and emoteConfig.SFXProperties.Looped then
-            sound.Looped = true
+        
+        if chosenSfxId and soundAttachmentPart then
+            local sound = Instance.new("Sound")
+            sound.SoundId = chosenSfxId
+            sound.Parent = soundAttachmentPart
+            if emoteConfig.SFXProperties and emoteConfig.SFXProperties.Looped then
+                sound.Looped = true
+                -- Connect the sound's Stopped event to the animation's Stopped event
+                -- This ensures the sound stops when the animation stops, especially if looped
+                local soundStoppedConnection
+                soundStoppedConnection = animationTrack.Stopped:Connect(function()
+                    if sound and sound.IsPlaying then
+                        sound:Stop()
+                    end
+                    if soundStoppedConnection then
+                        soundStoppedConnection:Disconnect()
+                    end
+                end)
+            end
+            sound:Play()
+            activeEmotes[targetHumanoid].sound = sound
+        elseif chosenSfxId then
+            warn(string.format("DEBUG: Sound for emote '%s' could not be played because no valid attachment part was found.", emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
         end
-        sound:Play()
-        activeEmotes[targetHumanoid].sound = sound
-    elseif emoteConfig.SFX then
-        warn(string.format("DEBUG: Sound for emote '%s' could not be played because no valid attachment part was found.", emoteConfig.DisplayName or emoteConfig.AssetID))
+    elseif emoteConfig.SFX and not characterModel then
+        warn("DEBUG: characterModel is NIL when trying to play sound for emote:", emoteConfig.DisplayName or tostring(emoteConfig.AssetID))
     end
     -------------------------------------------------------------------
 
@@ -184,18 +230,18 @@ end
 
 -- Функция создания кнопок для всех доступных эмоций
 local function createEmoteButtons()
-    for _, emoteConfig in pairs(emotesFolder:GetChildren()) do
-        if emoteConfig:IsA("ModuleScript") then
-            local success, emoteData = pcall(require, emoteConfig)
-            if success and emoteData.AssetID then
+    for _, emoteConfigModule in pairs(emotesFolder:GetChildren()) do
+        if emoteConfigModule:IsA("ModuleScript") then
+            local success, emoteData = pcall(require, emoteConfigModule)
+            if success and emoteData.AssetID then -- AssetID can be a string or a table, but must exist
                 local button = Instance.new("TextButton")
-                button.Name = emoteConfig.Name .. "Button"
+                button.Name = emoteConfigModule.Name .. "Button"
                 button.Parent = scrollingFrame
                 button.Size = UDim2.new(1, -10, 0, 40)
                 button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
                 button.BorderColor3 = Color3.fromRGB(255, 255, 255)
                 button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                button.Text = emoteData.DisplayName or emoteData.AssetID
+                button.Text = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Emote") -- Display name or a generic "Emote"
                 button.Font = Enum.Font.SourceSansBold
                 button.TextSize = 18
 
@@ -207,7 +253,7 @@ local function createEmoteButtons()
                     end
                 end)
             else
-                warn("DEBUG: Failed to require emote module:", emoteConfig.Name)
+                warn("DEBUG: Failed to require emote module or AssetID is missing:", emoteConfigModule.Name)
             end
         end
     end
@@ -295,6 +341,9 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
 end)
 
 -- Инициализация кнопок эмоций
+createEmoteButtons()
+
+print("DEBUG: Emote script loaded successfully.")
 createEmoteButtons()
 
 print("DEBUG: Emote script loaded successfully.")
