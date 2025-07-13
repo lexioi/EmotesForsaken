@@ -1,9 +1,9 @@
--- Script by lexioi (Modified and Fixed for table AssetID/SFX)
+-- Script by lexioi (Modified with Search and Duplicate Button Check)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local CollectionService = game:GetService("CollectionService") -- Not strictly used in this snippet, but kept if you expand functionality
+local CollectionService = game:GetService("CollectionService")
 
 -- Player and Character Variables (will be set dynamically)
 local player = Players.LocalPlayer
@@ -20,7 +20,7 @@ local emotesFolder = assetsFolder:WaitForChild("Emotes")
 -- State Management
 -- Store active animation tracks and sounds for the LOCAL player's humanoid only.
 local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack?, sound: Sound?, stoppedConnection: RBXScriptConnection?}} = {}
-local isMovementDisabled: boolean = false -- This variable seems unused in the current script based on the logic to reset movement.
+local isMovementDisabled: boolean = false
 
 -- GUI Creation
 local screenGui = Instance.new("ScreenGui")
@@ -63,10 +63,38 @@ titleLabel.Text = "Emotes"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 24
 
+-- Search elements
+local searchButton = Instance.new("TextButton")
+searchButton.Name = "SearchButton"
+searchButton.Parent = mainFrame
+searchButton.Size = UDim2.new(0, 30, 0, 30)
+searchButton.Position = UDim2.new(1, -35, 0, 5) -- Top right of mainFrame, slightly offset
+searchButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+searchButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchButton.Text = "🔍" -- Лупа
+searchButton.Font = Enum.Font.SourceSansBold
+searchButton.TextSize = 20
+searchButton.ZIndex = 2 -- Make sure it's above other elements
+
+local searchTextBox = Instance.new("TextBox")
+searchTextBox.Name = "SearchTextBox"
+searchTextBox.Parent = mainFrame
+searchTextBox.Size = UDim2.new(1, -40, 0, 30) -- Adjust size to fit next to search button
+searchTextBox.Position = UDim2.new(0, 5, 0, 45) -- Below title, offset from left
+searchTextBox.PlaceholderText = "Search emotes..."
+searchTextBox.TextScaled = true
+searchTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+searchTextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+searchTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchTextBox.Visible = false
+searchTextBox.ClearTextOnFocus = false
+searchTextBox.ZIndex = 2
+
 local scrollingFrame = Instance.new("ScrollingFrame")
 scrollingFrame.Name = "Container"
 scrollingFrame.Parent = mainFrame
-scrollingFrame.Size = UDim2.new(1, 0, 1, -40)
+scrollingFrame.Size = UDim2.new(1, 0, 1, -40) -- Initial size, adjusted when search is active
 scrollingFrame.Position = UDim2.new(0, 0, 0, 40)
 scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 scrollingFrame.BorderSizePixel = 0
@@ -77,6 +105,10 @@ local uiListLayout = Instance.new("UIListLayout")
 uiListLayout.Parent = scrollingFrame
 uiListLayout.Padding = UDim.new(0, 5)
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Store all loaded emote configurations for searching
+local allEmoteConfigs = {}
+local emoteButtons = {} -- Store references to created buttons for easy access/filtering
 
 -- Function to reset player movement to default
 local function resetPlayerMovement()
@@ -228,12 +260,45 @@ local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetI
     end)
 end
 
--- Функция создания кнопок для всех доступных эмоций
+-- Function to update the scrolling frame's CanvasSize
+local function updateCanvasSize()
+    task.wait(0.1) -- Small delay to allow UIListLayout to update
+    local contentSize = uiListLayout.AbsoluteContentSize
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+end
+
+-- Function to filter emote buttons based on search text
+local function filterEmoteButtons(searchText: string)
+    local lowerSearchText = searchText:lower()
+    for name, button in pairs(emoteButtons) do
+        local emoteName = button.Text:lower()
+        if string.find(emoteName, lowerSearchText) then
+            button.Visible = true
+        else
+            button.Visible = false
+        end
+    end
+    updateCanvasSize() -- Re-calculate canvas size after filtering
+end
+
+-- Function to create buttons for all available emotes
 local function createEmoteButtons()
+    local existingButtonNames = {} -- To track names and prevent duplicates
+
     for _, emoteConfigModule in pairs(emotesFolder:GetChildren()) do
         if emoteConfigModule:IsA("ModuleScript") then
             local success, emoteData = pcall(require, emoteConfigModule)
-            if success and emoteData.AssetID then -- AssetID can be a string or a table, but must exist
+            if success and emoteData.AssetID then
+                local buttonText = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Emote")
+                
+                -- Check for duplicate button names
+                if existingButtonNames[buttonText] then
+                    warn(string.format("DEBUG: Duplicate emote button found for '%s'. Skipping this one.", buttonText))
+                    continue -- Skip creating this button
+                end
+                
+                existingButtonNames[buttonText] = true -- Mark this name as used
+
                 local button = Instance.new("TextButton")
                 button.Name = emoteConfigModule.Name .. "Button"
                 button.Parent = scrollingFrame
@@ -241,7 +306,7 @@ local function createEmoteButtons()
                 button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
                 button.BorderColor3 = Color3.fromRGB(255, 255, 255)
                 button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                button.Text = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Emote") -- Display name or a generic "Emote"
+                button.Text = buttonText
                 button.Font = Enum.Font.SourceSansBold
                 button.TextSize = 18
 
@@ -252,43 +317,83 @@ local function createEmoteButtons()
                         warn("DEBUG: Cannot play emote, humanoid or character is nil.")
                     end
                 end)
+                
+                emoteButtons[buttonText] = button -- Store the button reference
+                table.insert(allEmoteConfigs, emoteData) -- Store config for search
             else
                 warn("DEBUG: Failed to require emote module or AssetID is missing:", emoteConfigModule.Name)
             end
         end
     end
 
-    -- Обновляем CanvasSize для ScrollingFrame
-    task.wait(0.1)
-    local contentSize = uiListLayout.AbsoluteContentSize
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+    updateCanvasSize() -- Initial canvas size calculation
 end
 
--- Функция переключения видимости меню эмоций
+-- Function to toggle the search bar visibility and adjust layout
+local function toggleSearchBar()
+    local isVisible = searchTextBox.Visible
+    searchTextBox.Visible = not isVisible
+
+    if searchTextBox.Visible then
+        searchTextBox:CaptureFocus() -- Focus on the text box when it appears
+        scrollingFrame.Position = UDim2.new(0, 0, 0, 80) -- Move scrolling frame down
+        scrollingFrame.Size = UDim2.new(1, 0, 1, -80) -- Reduce height
+        searchTextBox.Text = "" -- Clear previous search
+        filterEmoteButtons("") -- Show all emotes
+    else
+        searchTextBox:ReleaseFocus() -- Release focus when it disappears
+        scrollingFrame.Position = UDim2.new(0, 0, 0, 40) -- Move scrolling frame back up
+        scrollingFrame.Size = UDim2.new(1, 0, 1, -40) -- Restore height
+        filterEmoteButtons("") -- Show all emotes when closing search
+    end
+    updateCanvasSize()
+end
+
+-- Function to toggle emote menu visibility
 local function toggleMenu()
     mainFrame.Visible = not mainFrame.Visible
     openButton.Text = mainFrame.Visible and "Close Emotes" or "Open Emotes"
+    if not mainFrame.Visible then
+        -- If closing the menu, also close the search bar
+        if searchTextBox.Visible then
+            toggleSearchBar()
+        end
+    end
 end
 
--- Подключаем кнопку открытия меню
+-- Connect open button
 openButton.MouseButton1Click:Connect(toggleMenu)
 
--- Обработка обновления персонажа игрока
+-- Connect search button
+searchButton.MouseButton1Click:Connect(toggleSearchBar)
+
+-- Connect search text box .Changed event
+searchTextBox.Changed:Connect(function(property)
+    if property == "Text" then
+        filterEmoteButtons(searchTextBox.Text)
+    end
+end)
+
+-- Connect search text box .FocusLost event (e.g., when pressing Enter or clicking away)
+searchTextBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        filterEmoteButtons(searchTextBox.Text)
+    end
+end)
+
+-- Handle player character updates
 local function setupHumanoidConnections(targetHumanoid: Humanoid)
-    -- Следим за WalkSpeed и JumpPower для возможных корректировок, если нужно
-    -- Например, можно восстановить значение после эмоций, если мы их отключили
-    -- (Не обязательно в данном скрипте, так как мы явно сбрасываем их в resetPlayerMovement)
+    -- Place any humanoid-specific connections here if needed
 end
 
 local function handleCharacterSetup(newCharacter: Model)
     print("DEBUG: Character loaded:", newCharacter.Name)
-    -- Ждём появления humanoid
     local success, newHumanoid = pcall(function()
         return newCharacter:WaitForChild("Humanoid", 10)
     end)
     if success and newHumanoid then
         humanoid = newHumanoid
-        originalJumpPower = humanoid.JumpPower or 50 -- сохраняем оригинальный JumpPower
+        originalJumpPower = humanoid.JumpPower or 50
         print("DEBUG: Player Humanoid found for new character:", humanoid.Name)
         setupHumanoidConnections(humanoid)
         stopAllEmotes()
@@ -298,7 +403,7 @@ local function handleCharacterSetup(newCharacter: Model)
     end
 end
 
--- Слушаем смену персонажа
+-- Listen for character changes
 player.CharacterAdded:Connect(function(char)
     character = char
     handleCharacterSetup(char)
@@ -309,12 +414,11 @@ if player.Character then
     handleCharacterSetup(character)
 end
 
--- Остановить все эмоции по нажатию пробела и заблокировать прыжок
+-- Stop all emotes on Spacebar press and disable jump
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
 
     if input.KeyCode == Enum.KeyCode.Space then
-        -- Останавливаем эмоции и блокируем прыжок
         stopAllEmotes()
 
         if humanoid then
@@ -333,17 +437,13 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
 
     if input.KeyCode == Enum.KeyCode.Space then
-        -- Восстанавливаем прыжок после отпускания пробела
         if humanoid then
             humanoid.JumpPower = originalJumpPower
         end
     end
 end)
 
--- Инициализация кнопок эмоций
-createEmoteButtons()
-
-print("DEBUG: Emote script loaded successfully.")
+-- Initialize emote buttons
 createEmoteButtons()
 
 print("DEBUG: Emote script loaded successfully.")
