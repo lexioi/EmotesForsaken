@@ -1,11 +1,98 @@
--- Script by lexioi (Modified with Search and Duplicate Button Check)
+-- === НАСТРОЙКА КЛЮЧА ===
+local validKey = "Thanks4Join "
+local linkToCopy = "https://discord.gg/jCrnRkuN" -- замените на нужную ссылку
+
+-- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local keyGui = Instance.new("ScreenGui")
+keyGui.Name = "KeySystemGui"
+keyGui.ResetOnSpawn = false
+keyGui.Parent = playerGui
+
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.new(0, 300, 0, 200)
+keyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+keyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+keyFrame.BackgroundTransparency = 0.5 -- прозрачность 0.4-0.6
+keyFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+keyFrame.Parent = keyGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Key System"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 24
+title.Parent = keyFrame
+
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.8, 0, 0, 40)
+textBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+textBox.PlaceholderText = "Enter your key..."
+textBox.Text = ""
+textBox.TextScaled = true
+textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+textBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+textBox.Parent = keyFrame
+
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0.45, -5, 0, 40)
+copyButton.Position = UDim2.new(0.05, 0, 0.65, 0)
+copyButton.Text = "Copy Link"
+copyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.Font = Enum.Font.SourceSansBold
+copyButton.TextSize = 18
+copyButton.Parent = keyFrame
+
+local submitButton = Instance.new("TextButton")
+submitButton.Size = UDim2.new(0.45, -5, 0, 40)
+submitButton.Position = UDim2.new(0.5, 5, 0.65, 0)
+submitButton.Text = "Submit Key"
+submitButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitButton.Font = Enum.Font.SourceSansBold
+submitButton.TextSize = 18
+submitButton.Parent = keyFrame
+
+-- Текст "Скопировано!" под кнопкой Copy Link (изначально скрыт)
+local copiedLabel = Instance.new("TextLabel")
+copiedLabel.Size = UDim2.new(0.45, -5, 0, 20)
+copiedLabel.Position = UDim2.new(0.05, 0, 0.75, 0)
+copiedLabel.BackgroundTransparency = 1
+copiedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+copiedLabel.Font = Enum.Font.SourceSansBold
+copiedLabel.TextSize = 16
+copiedLabel.Text = ""
+copiedLabel.TextTransparency = 1 -- изначально скрыт
+copiedLabel.Parent = keyFrame
+
+-- === ФУНКЦИЯ КОПИРОВАНИЯ ССЫЛКИ ===
+copyButton.Activated:Connect(function()
+	setclipboard(linkToCopy)
+	
+	-- Показываем "Скопировано!" на 2 секунды
+	copiedLabel.Text = "Copied!"
+	copiedLabel.TextTransparency = 0
+	wait(2)
+	copiedLabel.TextTransparency = 1
+end)
+
+-- === ВСТАВЬ СЮДА КОД scriptl.txt ===
+local lexioiScript = [[
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
--- Player and Character Variables (will be set dynamically)
+-- Переменные игрока и персонажа (будут устанавливаться динамически)
 local player = Players.LocalPlayer
 print("DEBUG: LocalPlayer:", player.Name)
 
@@ -13,14 +100,191 @@ local character: Model? = nil
 local humanoid: Humanoid? = nil
 local originalJumpPower = 50
 
--- Assets
+-- Ресурсы
 local assetsFolder = ReplicatedStorage:WaitForChild("Assets")
 local emotesFolder = assetsFolder:WaitForChild("Emotes")
+-- Папка Animations больше не используется для загрузки ModuleScript'ов, но может существовать
+local animationsFolder = assetsFolder:FindFirstChild("Animations") or Instance.new("Folder", assetsFolder)
+animationsFolder.Name = "Animations" -- Создаем для консистентности, но она не будет сканироваться на ModuleScripts
 
--- State Management
--- Store active animation tracks and sounds for the LOCAL player's humanoid only.
+-- ВСТРОЕННЫЕ ДАННЫЕ АНИМАЦИЙ УБИЙЦ
+-- Все предоставленные вами анимации собраны здесь в одну таблицу.
+local allKillerAnimations = {
+    -- Анимации 1x1x1x1
+    ["1x1x1x1"] = { -- Это будет отображаться как название кнопки в меню
+        ZombieAnimations = {
+            Idle = "rbxassetid://138465378316476";
+            Walk = "rbxassetid://127848783748209";
+            Run = "rbxassetid://72722119435580";
+            Attack = "rbxassetid://81362825527808";
+            Summon = "rbxassetid://75804462760596";
+        };
+        Animations = {
+            Idle = "rbxassetid://138754221537146";
+            Walk = "rbxassetid://109130982296927";
+            Run = "rbxassetid://106485518413331";
+            Introduction = {
+                KillerRig = "rbxassetid://90184955335084";
+                CameraRig = "rbxassetid://81326704545708"; -- Игнорируется
+            };
+            Execution = {
+                KillerRig = "rbxassetid://93368339913846";
+                PlayerRig = "rbxassetid://116471413261624";
+            };
+            ExecutionShedletsky = {
+                KillerRig = "rbxassetid://123924093489218";
+                PlayerRig = "rbxassetid://116039506373774";
+            };
+            BetterIdle = "rbxassetid://138754221537146";
+            BetterWalk = "rbxassetid://131235528875091";
+            BetterRun = "rbxassetid://89252407304675";
+            Slash = "rbxassetid://83829782357897";
+            Entanglement = "rbxassetid://119181003138006";
+            UnstableEye = "rbxassetid://119429069577280";
+            RejuvenateTheRotten = "rbxassetid://116996902830888";
+            MassInfection = "rbxassetid://131430497821198";
+            Stunned = {
+                Start = "rbxassetid://96642629473615";
+                Loop = "rbxassetid://131392439047269";
+                End = "rbxassetid://121164654140845";
+            };
+            Victory = {
+                KillerRig = "rbxassetid://137889266669216";
+                CameraRig = "rbxassetid://129809576292762"; -- Игнорируется
+                ShedletskyRig = "rbxassetid://121740536645205";
+            };
+        };
+    },
+    -- Анимации c00lkidd
+    ["c00lkidd"] = {
+        PizzaDeliveryAnimations = {
+            Summoned = "rbxassetid://18886065814";
+            Idle = "rbxassetid://18886066950";
+            Walk = "rbxassetid://18886064499";
+            Hit = "rbxassetid://18886068630";
+        };
+        Animations = {
+            Idle = "rbxassetid://18885903667";
+            Walk = "rbxassetid://18885906143";
+            Run = "rbxassetid://96571077893813";
+            InjuredIdle = "rbxassetid://18885903667";
+            InjuredWalk = "rbxassetid://18885906143";
+            InjuredRun = "rbxassetid://96571077893813";
+            Stunned = {
+                Start = "rbxassetid://109869078763813";
+                Loop = "rbxassetid://125337218572338";
+                End = "rbxassetid://83635673319417";
+            };
+            Introduction = {
+                KillerRig = "rbxassetid://18924919303";
+                CameraRig = "rbxassetid://18925097303"; -- Игнорируется
+            };
+            Victory = {
+                KillerRig = "rbxassetid://108042935463999";
+                KillerRigLoop = "rbxassetid://86524030996609";
+                CameraRig = "rbxassetid://78439581321137"; -- Игнорируется
+            };
+            Execution = {
+                KillerRig = "rbxassetid://89669118763885";
+                PlayerRig = "rbxassetid://78051806190478";
+            };
+            Execution007n7 = {
+                KillerRig = "rbxassetid://133688616073016";
+                PlayerRig = "rbxassetid://132293609857524";
+            };
+            Attack = "rbxassetid://18885909645";
+            CorruptNature = "rbxassetid://18885919947";
+            SummonPizzaDelivery = "rbxassetid://18885915433";
+            WalkspeedOverrideStart = "rbxassetid://98456918873918";
+            WalkspeedOverrideLoop = "rbxassetid://106776364623742";
+            WalkspeedOverrideHit = "rbxassetid://18885937766";
+            WalkspeedOverrideMiss = "rbxassetid://18885940850";
+        };
+    },
+    -- Анимации Noli
+    ["Noli"] = {
+        Animations = {
+            Idle = "rbxassetid://83465205704188";
+            Walk = "rbxassetid://109700476007435";
+            Run = "rbxassetid://117451341682452";
+            InjuredIdle = "rbxassetid://83465205704188";
+            InjuredWalk = "rbxassetid://109700476007435";
+            InjuredRun = "rbxassetid://117451341682452";
+            Stab = "rbxassetid://109230267448394";
+            Victory = {
+                KillerRig = "rbxassetid://89207009102595";
+                CameraRig = "rbxassetid://92599409662127"; -- Игнорируется
+            };
+            VoidRush = {
+                StartCharge = "rbxassetid://91758760621955";
+                LoopCharge = "rbxassetid://93841120533318";
+                CancelCharge = "rbxassetid://91758760621955";
+                StartDashInit = "rbxassetid://139835501033932";
+                LoopDashInit = "rbxassetid://126896426760253";
+                StartDashCombo = "rbxassetid://114356208094580";
+                LoopDashCombo = "rbxassetid://135884061951801";
+                EndDash = "rbxassetid://139321362207112";
+                EndDashCrashed = "rbxassetid://94039555054855";
+                EndDashNonChar = "rbxassetid://94039555054855";
+                WeakHit = "rbxassetid://92243093913547";
+                CutsceneKillerRig = "rbxassetid://81533966558979";
+            };
+            VoidRushVictimRig = "rbxassetid://134053005930385";
+            NovaThrow = "rbxassetid://107339108383093";
+            NovaDet = "rbxassetid://125504560920616";
+            ObservantStart = "rbxassetid://113357690193035";
+            ObservantLoop = "rbxassetid://104744456957363";
+            ObservantTeleport = "rbxassetid://140042539182927";
+            Hallucination = "rbxassetid://140042539182927";
+            Introduction = {
+                KillerRig = "rbxassetid://82002727792391";
+                CameraRig = "rbxassetid://140061272138793"; -- Игнорируется
+            };
+            Execution = {
+                KillerRig = "rbxassetid://129491851057694";
+                PlayerRig = "rbxassetid://116544958644813";
+                PlayerCFrameOffset = CFrame.new(0, 0, -6); -- Игнорируется
+            };
+            Stunned = {
+                Start = "rbxassetid://128923537868786";
+                Loop = "rbxassetid://122580527125278";
+                End = "rbxassetid://99164529472582";
+            };
+        };
+    },
+    -- Jason и JohnDoe пока пустые, как вы и просили
+    ["Jason"] = { Animations = {} },
+    ["JohnDoe"] = { Animations = {} },
+}
+
+
+-- Управление состоянием
 local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack?, sound: Sound?, stoppedConnection: RBXScriptConnection?}} = {}
 local isMovementDisabled: boolean = false
+local currentCategory = "Emotes" -- Категория по умолчанию
+local currentSubCategory = nil -- Текущая выбранная подкатегория внутри "Animations"
+
+-- Хранит все загруженные конфигурации и кнопки по категориям
+local categoryData = {
+    Emotes = {
+        folder = emotesFolder,
+        configs = {},
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {}
+    },
+    Animations = {
+        folder = nil, -- Больше не сканируем папку, данные хардкодируются
+        subCategories = {}, -- Теперь здесь будут данные из allKillerAnimations
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {},
+        currentSubCategoryFrame = nil,
+        currentSubCategoryLayout = nil,
+    },
+}
 
 -- GUI Creation
 local screenGui = Instance.new("ScreenGui")
@@ -36,7 +300,7 @@ openButton.Position = UDim2.new(0.5, -75, 0.8, 0)
 openButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 openButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
 openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-openButton.Text = "Open Emotes"
+openButton.Text = "Open Menu"
 openButton.Font = Enum.Font.SourceSansBold
 openButton.TextSize = 20
 openButton.Active = true
@@ -45,44 +309,51 @@ openButton.Draggable = true
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "EmoteMenu"
 mainFrame.Parent = screenGui
-mainFrame.Size = UDim2.new(0, 400, 0, 300)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 400, 0, 350)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -175)
 mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "Title"
-titleLabel.Parent = mainFrame
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
-titleLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.Text = "Emotes"
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 24
+-- Контейнер кнопок категорий
+local categoryButtonsFrame = Instance.new("Frame")
+categoryButtonsFrame.Name = "CategoryButtons"
+categoryButtonsFrame.Parent = mainFrame
+categoryButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
+categoryButtonsFrame.Position = UDim2.new(0, 0, 0, 0)
+categoryButtonsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+categoryButtonsFrame.BorderSizePixel = 0
 
--- Search elements
+local uiListLayoutCategories = Instance.new("UIListLayout")
+uiListLayoutCategories.Parent = categoryButtonsFrame
+uiListLayoutCategories.FillDirection = Enum.FillDirection.Horizontal
+uiListLayoutCategories.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayoutCategories.VerticalAlignment = Enum.VerticalAlignment.Center
+uiListLayoutCategories.Padding = UDim.new(0, 5)
+uiListLayoutCategories.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Элементы поиска
 local searchButton = Instance.new("TextButton")
 searchButton.Name = "SearchButton"
 searchButton.Parent = mainFrame
 searchButton.Size = UDim2.new(0, 30, 0, 30)
-searchButton.Position = UDim2.new(1, -35, 0, 5) -- Top right of mainFrame, slightly offset
+searchButton.Position = UDim2.new(1, -35, 0, 45)
 searchButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
 searchButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
 searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-searchButton.Text = "🔍" -- Лупа
+searchButton.Text = "🔍"
 searchButton.Font = Enum.Font.SourceSansBold
 searchButton.TextSize = 20
-searchButton.ZIndex = 2 -- Make sure it's above other elements
+searchButton.ZIndex = 2
 
 local searchTextBox = Instance.new("TextBox")
 searchTextBox.Name = "SearchTextBox"
 searchTextBox.Parent = mainFrame
-searchTextBox.Size = UDim2.new(1, -40, 0, 30) -- Adjust size to fit next to search button
-searchTextBox.Position = UDim2.new(0, 5, 0, 45) -- Below title, offset from left
-searchTextBox.PlaceholderText = "Search emotes..."
+searchTextBox.Size = UDim2.new(1, -40, 0, 30)
+searchTextBox.Position = UDim2.new(0, 5, 0, 85)
+searchTextBox.PlaceholderText = "Search in the current category..."
 searchTextBox.TextScaled = true
 searchTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 searchTextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -91,26 +362,9 @@ searchTextBox.Visible = false
 searchTextBox.ClearTextOnFocus = false
 searchTextBox.ZIndex = 2
 
-local scrollingFrame = Instance.new("ScrollingFrame")
-scrollingFrame.Name = "Container"
-scrollingFrame.Parent = mainFrame
-scrollingFrame.Size = UDim2.new(1, 0, 1, -40) -- Initial size, adjusted when search is active
-scrollingFrame.Position = UDim2.new(0, 0, 0, 40)
-scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-scrollingFrame.BorderSizePixel = 0
-scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+--- Основные функции ---
 
-local uiListLayout = Instance.new("UIListLayout")
-uiListLayout.Parent = scrollingFrame
-uiListLayout.Padding = UDim.new(0, 5)
-uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-
--- Store all loaded emote configurations for searching
-local allEmoteConfigs = {}
-local emoteButtons = {} -- Store references to created buttons for easy access/filtering
-
--- Function to reset player movement to default
+-- Функция для сброса движения игрока к значениям по умолчанию
 local function resetPlayerMovement()
     if humanoid and isMovementDisabled then
         humanoid.WalkSpeed = 16
@@ -119,7 +373,7 @@ local function resetPlayerMovement()
     end
 end
 
--- Function to stop a specific emote for a given humanoid (only used for local player now)
+-- Функция для остановки конкретной эмоции для данного гуманоида (используется только для локального игрока сейчас)
 local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
     local emoteData = activeEmotes[targetHumanoid]
     if emoteData then
@@ -132,105 +386,94 @@ local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
         end
         if emoteData.sound then
             emoteData.sound:Stop()
-            emoteData.sound:Destroy() -- Clean up the sound instance
+            emoteData.sound:Destroy() -- Удаляем экземпляр звука
         end
         activeEmotes[targetHumanoid] = nil
     end
 end
 
--- Function to stop all currently playing emotes and reset player state
+-- Функция для остановки всех воспроизводимых в данный момент эмоций и сброса состояния игрока
 local function stopAllEmotes()
-    -- Останавливаем эмоции только для текущего humanoid
     if humanoid then
-        stopEmoteForHumanoid(humanoid) 
+        stopEmoteForHumanoid(humanoid)
     end
     activeEmotes = {}
     resetPlayerMovement()
 end
 
--- Local function to play animation (client-side only for instant feedback)
-local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetID: any, DisplayName: string?, SFX: any, SFXProperties: {Looped: boolean?}, SyncMusic: boolean?, SyncAnim: boolean?}, characterModel: Model)
-    -- Останавливаем любую активную эмоцию на этом гуманоиде перед началом новой
+-- Локальная функция для воспроизведения анимации (только на стороне клиента для мгновенной обратной связи)
+-- Включает поддержку для таблиц AssetID (случайный выбор) и SFX
+local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: any, sfxIdOrTable: any, sfxProperties: {Looped: boolean?}, characterModel: Model)
     stopEmoteForHumanoid(targetHumanoid)
 
     local animationIdToPlay: string
-    if type(emoteConfig.AssetID) == "table" then
-        -- If AssetID is a table, pick a random one
-        if #emoteConfig.AssetID > 0 then
-            animationIdToPlay = emoteConfig.AssetID[math.random(1, #emoteConfig.AssetID)]
-            print("DEBUG: Randomly selected AnimationId (from table):", animationIdToPlay)
+    if type(animationIdOrTable) == "table" then
+        if #animationIdOrTable > 0 then
+            animationIdToPlay = animationIdOrTable[math.random(1, #animationIdOrTable)]
+            print("DEBUG: Случайно выбранный AnimationId (из таблицы):", animationIdToPlay)
         else
-            warn("DEBUG: emoteConfig.AssetID is an empty table. Cannot play animation.")
-            return -- Exit if no animation IDs are provided
+            warn("DEBUG: animationIdOrTable является пустой таблицей. Невозможно воспроизвести анимацию.")
+            return
         end
-    elseif type(emoteConfig.AssetID) == "string" then
-        animationIdToPlay = emoteConfig.AssetID
-        print("DEBUG: Using AnimationId (from string):", animationIdToPlay)
+    elseif type(animationIdOrTable) == "string" then
+        animationIdToPlay = animationIdOrTable
+        print("DEBUG: Используем AnimationId (из строки):", animationIdToPlay)
     else
-        warn("DEBUG: Invalid type for emoteConfig.AssetID. Expected string or table, got", type(emoteConfig.AssetID))
-        return -- Exit if AssetID is neither string nor table
+        warn("DEBUG: Недопустимый тип для animationIdOrTable. Ожидалась строка или таблица, получено", type(animationIdOrTable))
+        return
     end
 
     local animation = Instance.new("Animation")
     animation.AnimationId = animationIdToPlay
     local animationTrack = targetHumanoid:LoadAnimation(animation)
     animationTrack:Play()
-    ------------------------------------------------------------------
 
-    -- Сохраняем данные активной эмоции для этого гуманоида (локального игрока)
     activeEmotes[targetHumanoid] = {animationTrack = animationTrack}
 
-    -- --- ДАЛЕЕ ИДЕТ ТОЛЬКО ЛОГИКА ДЛЯ ЗВУКА, которая не блокирует анимацию ---
     local soundAttachmentPart = nil
-    -- Пробуем найти часть для звука только если SFX существует и characterModel доступен
-    if emoteConfig.SFX and characterModel then
-        print("DEBUG: Attempting to find sound attachment part for characterModel:", characterModel.Name)
-        
+    if sfxIdOrTable and characterModel then
+        print("DEBUG: Пытаемся найти часть для прикрепления звука для characterModel:", characterModel.Name)
+
         local chosenSfxId: string
-        if type(emoteConfig.SFX) == "table" then
-            if #emoteConfig.SFX > 0 then
-                chosenSfxId = emoteConfig.SFX[math.random(1, #emoteConfig.SFX)]
-                print("DEBUG: Randomly selected SFXId (from table):", chosenSfxId)
+        if type(sfxIdOrTable) == "table" then
+            if #sfxIdOrTable > 0 then
+                chosenSfxId = sfxIdOrTable[math.random(1, #sfxIdOrTable)]
+                print("DEBUG: Случайно выбранный SFXId (из таблицы):", chosenSfxId)
             else
-                warn("DEBUG: emoteConfig.SFX is an empty table. Sound will not play.")
+                warn("DEBUG: sfxIdOrTable является пустой таблицей. Звук не будет воспроизводиться.")
             end
-        elseif type(emoteConfig.SFX) == "string" then
-            chosenSfxId = emoteConfig.SFX
-            print("DEBUG: Using SFXId (from string):", chosenSfxId)
+        elseif type(sfxIdOrTable) == "string" then
+            chosenSfxId = sfxIdOrTable
+            print("DEBUG: Используем SFXId (из строки):", chosenSfxId)
         else
-            warn("DEBUG: Invalid type for emoteConfig.SFX. Expected string or table, got", type(emoteConfig.SFX))
+            warn("DEBUG: Недопустимый тип для sfxIdOrTable. Ожидалась строка или таблица, получено", type(sfxIdOrTable))
         end
 
-        if chosenSfxId then -- Only proceed if a valid SFX ID was found
-            -- Сначала пытаемся найти HumanoidRootPart с увеличенным таймаутом
-            -- Используем pcall, чтобы предотвратить ошибку, если WaitForChild зависнет или вернет nil
-            local success, rootPartResult = pcall(function() 
-                return characterModel:WaitForChild("HumanoidRootPart", 10) 
+        if chosenSfxId then
+            local success, rootPartResult = pcall(function()
+                return characterModel:WaitForChild("HumanoidRootPart", 10)
             end)
-            
+
             if success and rootPartResult then
                 soundAttachmentPart = rootPartResult
-                print("DEBUG: Successfully found HumanoidRootPart for", characterModel.Name)
+                print("DEBUG: HumanoidRootPart успешно найдена для", characterModel.Name)
             else
-                warn(string.format("DEBUG: HumanoidRootPart NOT found for model '%s' within 10 seconds! Attempting alternative (UpperTorso/Torso). For emote '%s'", characterModel.Name, emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
-                -- Если HumanoidRootPart не найден за 10 секунд, пробуем UpperTorso, затем Torso
+                warn(string.format("DEBUG: HumanoidRootPart НЕ найдена для модели '%s' в течение 10 секунд! Пытаемся использовать альтернативу (UpperTorso/Torso).", characterModel.Name))
                 soundAttachmentPart = characterModel:FindFirstChild("UpperTorso") or characterModel:FindFirstChild("Torso")
                 if soundAttachmentPart then
-                    print(string.format("DEBUG: Successfully found alternative sound attachment part (%s) for %s.", soundAttachmentPart.Name, characterModel.Name))
+                    print(string.format("DEBUG: Успешно найдена альтернативная часть для прикрепления звука (%s) для %s.", soundAttachmentPart.Name, characterModel.Name))
                 else
-                    warn(string.format("DEBUG: Neither HumanoidRootPart, UpperTorso, nor Torso found for model '%s'! Sound will not play for emote '%s'", characterModel.Name, emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
+                    warn(string.format("DEBUG: Ни HumanoidRootPart, ни UpperTorso, ни Torso не найдены для модели '%s'! Звук не будет воспроизводиться.", characterModel.Name))
                 end
             end
         end
-        
+
         if chosenSfxId and soundAttachmentPart then
             local sound = Instance.new("Sound")
             sound.SoundId = chosenSfxId
             sound.Parent = soundAttachmentPart
-            if emoteConfig.SFXProperties and emoteConfig.SFXProperties.Looped then
+            if sfxProperties and sfxProperties.Looped then
                 sound.Looped = true
-                -- Connect the sound's Stopped event to the animation's Stopped event
-                -- This ensures the sound stops when the animation stops, especially if looped
                 local soundStoppedConnection
                 soundStoppedConnection = animationTrack.Stopped:Connect(function()
                     if sound and sound.IsPlaying then
@@ -244,166 +487,506 @@ local function playLocalAnimation(targetHumanoid: Humanoid, emoteConfig: {AssetI
             sound:Play()
             activeEmotes[targetHumanoid].sound = sound
         elseif chosenSfxId then
-            warn(string.format("DEBUG: Sound for emote '%s' could not be played because no valid attachment part was found.", emoteConfig.DisplayName or tostring(emoteConfig.AssetID)))
+            warn(string.format("DEBUG: Звук для анимации '%s' не мог быть воспроизведен, потому что не найдена допустимая часть для прикрепления.", animationIdToPlay))
         end
-    elseif emoteConfig.SFX and not characterModel then
-        warn("DEBUG: characterModel is NIL when trying to play sound for emote:", emoteConfig.DisplayName or tostring(emoteConfig.AssetID))
+    elseif sfxIdOrTable and not characterModel then
+        warn("DEBUG: characterModel = NIL при попытке воспроизвести звук для анимации:", animationIdToPlay)
     end
-    -------------------------------------------------------------------
 
-    -- Подключаемся к событию 'Stopped' анимации, чтобы автоматически остановить эмоцию
     activeEmotes[targetHumanoid].stoppedConnection = animationTrack.Stopped:Connect(function()
-        task.wait() -- Небольшая задержка, чтобы убедиться, что это не сработает при ручной остановке
+        task.wait()
         if activeEmotes[targetHumanoid] and activeEmotes[targetHumanoid].animationTrack == animationTrack then
             stopEmoteForHumanoid(targetHumanoid)
         end
     end)
 end
 
--- Function to update the scrolling frame's CanvasSize
-local function updateCanvasSize()
-    task.wait(0.1) -- Small delay to allow UIListLayout to update
-    local contentSize = uiListLayout.AbsoluteContentSize
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+
+-- Функция для обновления размера холста ScrollingFrame для данной категории
+local function updateCanvasSize(targetFrame: ScrollingFrame, targetLayout: UIListLayout)
+    if not targetFrame or not targetLayout then return end
+
+    task.wait(0.1) -- Небольшая задержка, чтобы UIListLayout успел обновиться
+    local contentSize = targetLayout.AbsoluteContentSize
+    targetFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
 end
 
--- Function to filter emote buttons based on search text
-local function filterEmoteButtons(searchText: string)
+-- Функция для фильтрации кнопок эмоций/анимаций на основе текста поиска для текущей активной панели
+local function filterButtons(searchText: string)
     local lowerSearchText = searchText:lower()
-    for name, button in pairs(emoteButtons) do
-        local emoteName = button.Text:lower()
-        if string.find(emoteName, lowerSearchText) then
+    local targetButtons = nil
+    local targetScrollingFrame = nil
+    local targetUIListLayout = nil
+
+    if currentCategory == "Emotes" then
+        targetButtons = categoryData.Emotes.buttons
+        targetScrollingFrame = categoryData.Emotes.scrollingFrame
+        targetUIListLayout = categoryData.Emotes.uiListLayout
+    elseif currentCategory == "Animations" then
+        if currentSubCategory then
+            -- Если выбрана подкатегория, фильтруем ее кнопки
+            targetButtons = categoryData.Animations.subCategories[currentSubCategory].buttons
+            targetScrollingFrame = categoryData.Animations.currentSubCategoryFrame
+            targetUIListLayout = categoryData.Animations.currentSubCategoryLayout
+        else
+            -- Если нет подкатегории, фильтруем кнопки подкатегорий
+            targetButtons = categoryData.Animations.buttons
+            targetScrollingFrame = categoryData.Animations.scrollingFrame
+            targetUIListLayout = categoryData.Animations.uiListLayout
+        end
+    end
+
+    if not targetButtons then return end
+
+    for name, button in pairs(targetButtons) do
+        local buttonText = button.Text:lower()
+        if string.find(buttonText, lowerSearchText) then
             button.Visible = true
         else
             button.Visible = false
         end
     end
-    updateCanvasSize() -- Re-calculate canvas size after filtering
+
+    if targetScrollingFrame and targetUIListLayout then
+        updateCanvasSize(targetScrollingFrame, targetUIListLayout)
+    end
 end
 
--- Function to create buttons for all available emotes
-local function createEmoteButtons()
-    local existingButtonNames = {} -- To track names and prevent duplicates
+-- Функция для проверки, является ли данная анимация "камерой"
+local function isCameraAnimation(animData: any)
+    if type(animData) ~= "table" then return false end
+    -- Проверяем, содержит ли таблица ключи, указывающие на анимацию камеры.
+    -- Это может быть CameraRig или Camera, или KillerRig + CameraRig.
+    if animData.CameraRig or animData.Camera then return true end
+    -- Если это таблица с KillerRig, но без PlayerRig, это часто относится к катсценам/камере
+    if animData.KillerRig and not animData.PlayerRig then return true end
+    -- Дополнительно: если есть PlayerCFrameOffset, это тоже не прямая анимация для игрока
+    if animData.PlayerCFrameOffset then return true end
 
-    for _, emoteConfigModule in pairs(emotesFolder:GetChildren()) do
-        if emoteConfigModule:IsA("ModuleScript") then
-            local success, emoteData = pcall(require, emoteConfigModule)
-            if success and emoteData.AssetID then
-                local buttonText = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Emote")
-                
-                -- Check for duplicate button names
-                if existingButtonNames[buttonText] then
-                    warn(string.format("DEBUG: Duplicate emote button found for '%s'. Skipping this one.", buttonText))
-                    continue -- Skip creating this button
+    return false
+end
+
+-- Рекурсивная функция для создания кнопок анимаций из таблицы данных
+-- В эту функцию передается имя "киллера" (например, "1x1x1x1")
+local function createAnimationButtonsRecursive(parentFrame: ScrollingFrame, parentLayout: UIListLayout, animationTable: table, killerName: string)
+    for animName, animValue in pairs(animationTable) do
+        -- Игнорируем специфические поля из ваших модулей, которые не являются AssetID
+        if animName == "IntroLighting" or animName == "OutroLighting" or animName == "IntroSky" then
+            continue
+        end
+
+        if type(animValue) == "string" and string.find(animValue, "rbxassetid://") then
+            -- Это прямая анимация (AssetID)
+            local button = Instance.new("TextButton")
+            button.Name = animName .. "Button"
+            button.Parent = parentFrame
+            button.Size = UDim2.new(1, -10, 0, 40)
+            button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            button.Text = animName -- Отображаем имя анимации (например, "Idle", "Walk")
+            button.Font = Enum.Font.SourceSansBold
+            button.TextSize = 18
+
+            button.MouseButton1Click:Connect(function()
+                if humanoid and character then
+                    -- Воспроизводим анимацию. Предполагаем, что нет SFX или SFXProperties для этих.
+                    playLocalAnimation(humanoid, animValue, nil, nil, character)
+                else
+                    warn("DEBUG: Невозможно воспроизвести анимацию, гуманоид или персонаж равен nil.")
                 end
-                
-                existingButtonNames[buttonText] = true -- Mark this name as used
-
-                local button = Instance.new("TextButton")
-                button.Name = emoteConfigModule.Name .. "Button"
-                button.Parent = scrollingFrame
-                button.Size = UDim2.new(1, -10, 0, 40)
-                button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                button.BorderColor3 = Color3.fromRGB(255, 255, 255)
-                button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                button.Text = buttonText
-                button.Font = Enum.Font.SourceSansBold
-                button.TextSize = 18
-
-                button.MouseButton1Click:Connect(function()
-                    if humanoid and character then
-                        playLocalAnimation(humanoid, emoteData, character)
-                    else
-                        warn("DEBUG: Cannot play emote, humanoid or character is nil.")
-                    end
-                end)
-                
-                emoteButtons[buttonText] = button -- Store the button reference
-                table.insert(allEmoteConfigs, emoteData) -- Store config for search
-            else
-                warn("DEBUG: Failed to require emote module or AssetID is missing:", emoteConfigModule.Name)
-            end
+            end)
+            -- Добавляем кнопку в кэш подкатегории для фильтрации
+            table.insert(categoryData.Animations.subCategories[killerName].buttons, button)
+        elseif type(animValue) == "table" and not isCameraAnimation(animValue) then
+            -- Это вложенная таблица, и это НЕ анимация камеры. Рекурсивно создаем кнопки для нее.
+            -- Мы пропускаем создание отдельной кнопки для самой вложенной таблицы (например, "Stunned"),
+            -- а создаем кнопки для ее дочерних элементов ("Start", "Loop", "End").
+            createAnimationButtonsRecursive(parentFrame, parentLayout, animValue, killerName)
         end
     end
-
-    updateCanvasSize() -- Initial canvas size calculation
 end
 
--- Function to toggle the search bar visibility and adjust layout
+
+-- Функция для создания кнопок для основной категории (Emotes, Animations)
+local function createCategoryButtons(categoryName: string, folder: Folder?)
+    local currentCategoryData = categoryData[categoryName]
+    if not currentCategoryData then return end
+
+    -- Очищаем существующие кнопки и кэши для этой категории
+    for _, button in pairs(currentCategoryData.buttons) do
+        button:Destroy()
+    end
+    currentCategoryData.buttons = {}
+    currentCategoryData.configs = {}
+    currentCategoryData.buttonNameCache = {}
+
+    if categoryName == "Emotes" then
+        if not folder then
+            warn("DEBUG: Emotes folder is nil. Skipping emote button creation.")
+            return
+        end
+        for _, emoteConfigModule in pairs(folder:GetChildren()) do
+            if emoteConfigModule:IsA("ModuleScript") then
+                local success, emoteData = pcall(require, emoteConfigModule)
+                if success and emoteData.AssetID then
+                    local buttonText = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Эмоция")
+
+                    if currentCategoryData.buttonNameCache[buttonText] then
+                        warn(string.format("DEBUG: Обнаружена дублирующая кнопка эмоции '%s' в категории '%s'. Пропускаем ее.", buttonText, categoryName))
+                        continue
+                    end
+
+                    currentCategoryData.buttonNameCache[buttonText] = true
+
+                    local button = Instance.new("TextButton")
+                    button.Name = emoteConfigModule.Name .. "Button"
+                    button.Parent = currentCategoryData.scrollingFrame
+                    button.Size = UDim2.new(1, -10, 0, 40)
+                    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                    button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+                    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    button.Text = buttonText
+                    button.Font = Enum.Font.SourceSansBold
+                    button.TextSize = 18
+
+                    button.MouseButton1Click:Connect(function()
+                        if humanoid and character then
+                            playLocalAnimation(humanoid, emoteData.AssetID, emoteData.SFX, emoteData.SFXProperties, character)
+                        else
+                            warn("DEBUG: Невозможно воспроизвести эмоцию, гуманоид или персонаж равен nil.")
+                        end
+                    end)
+
+                    currentCategoryData.buttons[buttonText] = button
+                    table.insert(currentCategoryData.configs, emoteData)
+                else
+                    warn("DEBUG: Не удалось загрузить модуль эмоции или отсутствует AssetID в папке '%s':", categoryName, emoteConfigModule.Name)
+                end
+            end
+        end
+        updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
+
+    elseif categoryName == "Animations" then
+        -- Для "Animations" мы теперь используем встроенные данные allKillerAnimations
+        for killerName, killerData in pairs(allKillerAnimations) do
+            -- Создаем данные для этой подкатегории (например, "1x1x1x1")
+            currentCategoryData.subCategories[killerName] = {
+                data = killerData, -- Хранит встроенные данные
+                buttons = {}, -- Будут кнопки анимаций для этой подкатегории
+                scrollingFrame = nil,
+                uiListLayout = nil,
+                buttonNameCache = {}
+            }
+
+            -- Создаем кнопку для подкатегории (например, "1x1x1x1")
+            local subCategoryButton = Instance.new("TextButton")
+            subCategoryButton.Name = killerName .. "SubCategoryButton"
+            subCategoryButton.Parent = currentCategoryData.scrollingFrame
+            subCategoryButton.Size = UDim2.new(1, -10, 0, 40)
+            subCategoryButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+            subCategoryButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+            subCategoryButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            subCategoryButton.Text = killerName
+            subCategoryButton.Font = Enum.Font.SourceSansBold
+            subCategoryButton.TextSize = 18
+            currentCategoryData.buttons[killerName] = subCategoryButton
+
+            subCategoryButton.MouseButton1Click:Connect(function()
+                -- Скрываем основной ScrollingFrame "Animations"
+                currentCategoryData.scrollingFrame.Visible = false
+                currentSubCategory = killerName
+
+                -- Создаем или показываем ScrollingFrame для этой подкатегории
+                local subCatFrame = currentCategoryData.subCategories[killerName].scrollingFrame
+                local subCatLayout = currentCategoryData.subCategories[killerName].uiListLayout
+
+                if not subCatFrame then
+                    subCatFrame = Instance.new("ScrollingFrame")
+                    subCatFrame.Name = killerName .. "AnimationsContainer"
+                    subCatFrame.Parent = mainFrame
+                    subCatFrame.Size = UDim2.new(1, 0, 1, -80)
+                    subCatFrame.Position = UDim2.new(0, 0, 0, 80)
+                    subCatFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                    subCatFrame.BorderSizePixel = 0
+                    subCatFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+                    subCatFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+                    subCatFrame.Visible = true
+
+                    subCatLayout = Instance.new("UIListLayout")
+                    subCatLayout.Parent = subCatFrame
+                    subCatLayout.Padding = UDim.new(0, 5)
+                    subCatLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+                    currentCategoryData.subCategories[killerName].scrollingFrame = subCatFrame
+                    currentCategoryData.subCategories[killerName].uiListLayout = subCatLayout
+
+                    -- Теперь создаем кнопки для анимаций внутри этого встроенного набора данных
+                    if killerData.ZombieAnimations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.ZombieAnimations, killerName)
+                    end
+                    if killerData.Animations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.Animations, killerName)
+                    end
+                    if killerData.PizzaDeliveryAnimations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.PizzaDeliveryAnimations, killerName)
+                    end
+                    if killerData.VoidRush then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.VoidRush, killerName)
+                    end
+                    for k, v in pairs(killerData) do
+                        if type(v) == "string" and string.find(v, "rbxassetid://") and not isCameraAnimation(v) then
+                             -- Создать кнопку для этой top-level анимации
+                            local button = Instance.new("TextButton")
+                            button.Name = k .. "Button"
+                            button.Parent = subCatFrame
+                            button.Size = UDim2.new(1, -10, 0, 40)
+                            button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                            button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+                            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+                            button.Text = k
+                            button.Font = Enum.Font.SourceSansBold
+                            button.TextSize = 18
+                            button.MouseButton1Click:Connect(function()
+                                if humanoid and character then
+                                    playLocalAnimation(humanoid, v, nil, nil, character)
+                                else
+                                    warn("DEBUG: Невозможно воспроизвести анимацию, гуманоид или персонаж равен nil.")
+                                end
+                            end)
+                            table.insert(currentCategoryData.subCategories[killerName].buttons, button)
+                        end
+                    end
+
+
+                else
+                    subCatFrame.Visible = true
+                end
+
+                currentCategoryData.currentSubCategoryFrame = subCatFrame
+                currentCategoryData.currentSubCategoryLayout = subCatLayout
+
+                -- Обновляем размер холста для новой подкатегории
+                updateCanvasSize(subCatFrame, subCatLayout)
+                searchTextBox.Text = "" -- Сбрасываем поиск при смене подкатегории
+                filterButtons("")
+            end)
+        end
+        updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
+    end
+end
+
+-- Функция для возврата из подкатегории к списку подкатегорий
+local function backToSubCategories()
+    local animData = categoryData.Animations
+    if animData.currentSubCategoryFrame then
+        animData.currentSubCategoryFrame.Visible = false
+        animData.currentSubCategoryFrame = nil
+        animData.currentSubCategoryLayout = nil
+    end
+    currentSubCategory = nil
+    animData.scrollingFrame.Visible = true -- Показываем основной список подкатегорий
+    searchTextBox.Text = ""
+    filterButtons("")
+    updateCanvasSize(animData.scrollingFrame, animData.uiListLayout)
+end
+
+-- Создаем кнопку "Назад" для подкатегорий
+local backButton = Instance.new("TextButton")
+backButton.Name = "BackButton"
+backButton.Parent = mainFrame
+backButton.Size = UDim2.new(0, 60, 0, 30)
+backButton.Position = UDim2.new(0, 5, 0, 45) -- Слева от поиска
+backButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+backButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+backButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+backButton.Text = "← Back"
+backButton.Font = Enum.Font.SourceSansBold
+backButton.TextSize = 14
+backButton.ZIndex = 2
+backButton.Visible = false -- Изначально скрыт
+
+backButton.MouseButton1Click:Connect(backToSubCategories)
+
+
+-- Функция для переключения активной категории
+local function switchToCategory(newCategoryName: string)
+    if currentCategory == newCategoryName and not currentSubCategory then return end
+
+    -- Скрываем ScrollingFrame предыдущей категории
+    local prevCategoryData = categoryData[currentCategory]
+    if prevCategoryData and prevCategoryData.scrollingFrame then
+        prevCategoryData.scrollingFrame.Visible = false
+    end
+    -- Если была открыта подкатегория, скрываем её
+    if prevCategoryData and prevCategoryData.currentSubCategoryFrame then
+        prevCategoryData.currentSubCategoryFrame.Visible = false
+        prevCategoryData.currentSubCategoryFrame = nil
+        prevCategoryData.currentSubCategoryLayout = nil
+    end
+    currentSubCategory = nil -- Сбрасываем подкатегорию при смене основной категории
+
+    -- Показываем ScrollingFrame новой категории
+    local newCategoryData = categoryData[newCategoryName]
+    if newCategoryData and newCategoryData.scrollingFrame then
+        newCategoryData.scrollingFrame.Visible = true
+        currentCategory = newCategoryName
+
+        -- Управляем видимостью кнопки "Назад"
+        backButton.Visible = (newCategoryName == "Animations")
+
+        -- Сбрасываем поиск и фильтр для новой категории
+        searchTextBox.Text = ""
+        filterButtons("")
+
+        print("DEBUG: Переключено на категорию:", newCategoryName)
+    else
+        warn("DEBUG: Попытка переключиться на несуществующую или неинициализированную категорию:", newCategoryName)
+    end
+end
+
+
+--- Настройка GUI и соединения ---
+
+-- Создаем ScrollingFrame и UIListLayout для каждой основной категории
+for catName, catData in pairs(categoryData) do
+    local scrollingFrame = Instance.new("ScrollingFrame")
+    scrollingFrame.Name = catName .. "Container"
+    scrollingFrame.Parent = mainFrame
+    scrollingFrame.Size = UDim2.new(1, 0, 1, -80) -- Скорректированная высота для кнопок категорий + поиска
+    scrollingFrame.Position = UDim2.new(0, 0, 0, 80) -- Скорректированная позиция
+    scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    scrollingFrame.BorderSizePixel = 0
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+    scrollingFrame.Visible = false -- Изначально скрыт
+
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Parent = scrollingFrame
+    uiListLayout.Padding = UDim.new(0, 5)
+    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    catData.scrollingFrame = scrollingFrame
+    catData.uiListLayout = uiListLayout
+end
+
+-- Создаем кнопки выбора категорий
+local categoryButtonNames = {"Emotes", "Animations"}
+for i, catName in ipairs(categoryButtonNames) do
+    local button = Instance.new("TextButton")
+    button.Name = catName .. "Tab"
+    button.Parent = categoryButtonsFrame
+    button.Size = UDim2.new(1/#categoryButtonNames, -5, 1, -10) -- Распределяем по горизонтали с небольшим отступом
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = catName
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 18
+    button.LayoutOrder = i -- Обеспечиваем порядок с UIListLayout
+
+    button.MouseButton1Click:Connect(function()
+        switchToCategory(catName)
+    end)
+end
+
+-- Функция для переключения видимости панели поиска и настройки макета
 local function toggleSearchBar()
     local isVisible = searchTextBox.Visible
     searchTextBox.Visible = not isVisible
 
-    if searchTextBox.Visible then
-        searchTextBox:CaptureFocus() -- Focus on the text box when it appears
-        scrollingFrame.Position = UDim2.new(0, 0, 0, 80) -- Move scrolling frame down
-        scrollingFrame.Size = UDim2.new(1, 0, 1, -80) -- Reduce height
-        searchTextBox.Text = "" -- Clear previous search
-        filterEmoteButtons("") -- Show all emotes
-    else
-        searchTextBox:ReleaseFocus() -- Release focus when it disappears
-        scrollingFrame.Position = UDim2.new(0, 0, 0, 40) -- Move scrolling frame back up
-        scrollingFrame.Size = UDim2.new(1, 0, 1, -40) -- Restore height
-        filterEmoteButtons("") -- Show all emotes when closing search
+    local targetSf = nil
+    local targetLayout = nil
+
+    if currentCategory == "Emotes" then
+        targetSf = categoryData.Emotes.scrollingFrame
+        targetLayout = categoryData.Emotes.uiListLayout
+    elseif currentCategory == "Animations" then
+        if currentSubCategory then
+            targetSf = categoryData.Animations.currentSubCategoryFrame
+            targetLayout = categoryData.Animations.currentSubCategoryLayout
+        else
+            targetSf = categoryData.Animations.scrollingFrame
+            targetLayout = categoryData.Animations.uiListLayout
+        end
     end
-    updateCanvasSize()
+
+    if not targetSf then return end
+
+    if searchTextBox.Visible then
+        searchTextBox:CaptureFocus()
+        targetSf.Position = UDim2.new(0, 0, 0, 115) -- Перемещаем ScrollingFrame ниже для поиска
+        targetSf.Size = UDim2.new(1, 0, 1, -115) -- Уменьшаем высоту
+        searchTextBox.Text = ""
+        filterButtons("")
+    else
+        searchTextBox:ReleaseFocus()
+        targetSf.Position = UDim2.new(0, 0, 0, 80) -- Перемещаем ScrollingFrame обратно
+        targetSf.Size = UDim2.new(1, 0, 1, -80) -- Восстанавливаем высоту
+        filterButtons("")
+    end
+    updateCanvasSize(targetSf, targetLayout)
 end
 
--- Function to toggle emote menu visibility
+-- Функция для переключения видимости меню эмоций
 local function toggleMenu()
     mainFrame.Visible = not mainFrame.Visible
-    openButton.Text = mainFrame.Visible and "Close Emotes" or "Open Emotes"
-    if not mainFrame.Visible then
-        -- If closing the menu, also close the search bar
+    openButton.Text = mainFrame.Visible and "Close Menu" or "Open Menu"
+    if mainFrame.Visible then
+        -- При открытии меню убедимся, что показана категория по умолчанию
+        switchToCategory("Emotes") -- Или любая другая по умолчанию
+    else
+        -- Если закрываем меню, также закрываем строку поиска
         if searchTextBox.Visible then
             toggleSearchBar()
         end
+        -- Скрываем кнопку "Назад", если меню закрыто
+        backButton.Visible = false
     end
 end
 
--- Connect open button
+-- Подключаем кнопку открытия
 openButton.MouseButton1Click:Connect(toggleMenu)
 
--- Connect search button
+-- Подключаем кнопку поиска
 searchButton.MouseButton1Click:Connect(toggleSearchBar)
 
--- Connect search text box .Changed event
+-- Подключаем событие .Changed текстового поля поиска
 searchTextBox.Changed:Connect(function(property)
     if property == "Text" then
-        filterEmoteButtons(searchTextBox.Text)
+        filterButtons(searchTextBox.Text)
     end
 end)
 
--- Connect search text box .FocusLost event (e.g., when pressing Enter or clicking away)
+-- Подключаем событие .FocusLost текстового поля поиска (например, при нажатии Enter или клике в сторону)
 searchTextBox.FocusLost:Connect(function(enterPressed)
     if enterPressed then
-        filterEmoteButtons(searchTextBox.Text)
+        filterButtons(searchTextBox.Text)
     end
 end)
 
--- Handle player character updates
+-- Обработка обновлений персонажа игрока
 local function setupHumanoidConnections(targetHumanoid: Humanoid)
-    -- Place any humanoid-specific connections here if needed
 end
 
 local function handleCharacterSetup(newCharacter: Model)
-    print("DEBUG: Character loaded:", newCharacter.Name)
+    print("DEBUG: Персонаж загружен:", newCharacter.Name)
     local success, newHumanoid = pcall(function()
         return newCharacter:WaitForChild("Humanoid", 10)
     end)
     if success and newHumanoid then
         humanoid = newHumanoid
         originalJumpPower = humanoid.JumpPower or 50
-        print("DEBUG: Player Humanoid found for new character:", humanoid.Name)
+        print("DEBUG: Гуманоид игрока найден для нового персонажа:", humanoid.Name)
         setupHumanoidConnections(humanoid)
         stopAllEmotes()
     else
         humanoid = nil
-        warn("DEBUG: Humanoid not found in new character model:", newCharacter.Name, "after 10 seconds.")
+        warn("DEBUG: Гуманоид не найден в новой модели персонажа:", newCharacter.Name, "после 10 секунд.")
     end
 end
 
--- Listen for character changes
+-- Слушаем изменения персонажа
 player.CharacterAdded:Connect(function(char)
     character = char
     handleCharacterSetup(char)
@@ -414,7 +997,7 @@ if player.Character then
     handleCharacterSetup(character)
 end
 
--- Stop all emotes on Spacebar press and disable jump
+-- Останавливаем все эмоции при нажатии Пробела и отключаем прыжок
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
 
@@ -443,7 +1026,31 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
     end
 end)
 
--- Initialize emote buttons
-createEmoteButtons()
+-- Начальное заполнение кнопок эмоций для всех категорий
+-- Folder для Emotes передаем, для Animations - nil, т.к. данные встроены
+createCategoryButtons("Emotes", emotesFolder)
+createCategoryButtons("Animations", nil) -- Передаем nil, т.к. данные уже в скрипте
 
-print("DEBUG: Emote script loaded successfully.")
+-- Устанавливаем начальную видимую категорию
+switchToCategory("Emotes")
+
+print("DEBUG: Скрипт эмоций успешно загружен с категориями и встроенными анимациями.")
+]]
+
+-- === ОБРАБОТКА КНОПКИ ПОДТВЕРЖДЕНИЯ КЛЮЧА ===
+submitButton.MouseButton1Click:Connect(function()
+	local inputKey = textBox.Text
+	if inputKey == validKey then
+		keyGui:Destroy()
+
+		local success, err = pcall(function()
+			loadstring(lexioiScript)()
+		end)
+
+		if not success then
+			warn("Ошибка при запуске скрипта Lexioi: " .. tostring(err))
+		end
+	else
+		textBox.Text = "Invalid key!"
+	end
+end)
