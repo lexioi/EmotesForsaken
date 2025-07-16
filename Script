@@ -1,5 +1,5 @@
 -- === НАСТРОЙКА КЛЮЧА ===
-local validKey = "Thanks4Join"
+local validKey = "Ty4Join"
 local linkToCopy = "https://discord.gg/jCrnRkuN" -- замените на нужную ссылку
 
 -- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
@@ -108,161 +108,266 @@ local animationsFolder = assetsFolder:FindFirstChild("Animations") or Instance.n
 animationsFolder.Name = "Animations" -- Создаем для консистентности, но она не будет сканироваться на ModuleScripts
 
 -- ВСТРОЕННЫЕ ДАННЫЕ АНИМАЦИЙ УБИЙЦ
--- Все предоставленные вами анимации собраны здесь в одну таблицу.
 local allKillerAnimations = {
     -- Анимации 1x1x1x1
     ["1x1x1x1"] = { -- Это будет отображаться как название кнопки в меню
         ZombieAnimations = {
-            Idle = "rbxassetid://138465378316476";
-            Walk = "rbxassetid://127848783748209";
-            Run = "rbxassetid://72722119435580";
-            Attack = "rbxassetid://81362825527808";
-            Summon = "rbxassetid://75804462760596";
-        };
+            Idle = "rbxassetid://138465378316476",
+            Walk = "rbxassetid://127848783748209",
+            Run = "rbxassetid://72722119435580",
+            Attack = "rbxassetid://81362825527808",
+            Summon = "rbxassetid://75804462760596",
+        },
         Animations = {
-            Idle = "rbxassetid://138754221537146";
-            Walk = "rbxassetid://109130982296927";
-            Run = "rbxassetid://106485518413331";
+            Idle = "rbxassetid://138754221537146",
+            Walk = "rbxassetid://109130982296927",
+            Run = "rbxassetid://106485518413331",
             Introduction = {
-                KillerRig = "rbxassetid://90184955335084";
-                CameraRig = "rbxassetid://81326704545708"; -- Игнорируется
-            };
+                KillerRig = "rbxassetid://90184955335084",
+                CameraRig = "rbxassetid://81326704545708",
+            },
             Execution = {
-                KillerRig = "rbxassetid://93368339913846";
-                PlayerRig = "rbxassetid://116471413261624";
-            };
+                KillerRig = "rbxassetid://93368339913846",
+                PlayerRig = "rbxassetid://116471413261624",
+            },
             ExecutionShedletsky = {
-                KillerRig = "rbxassetid://123924093489218";
-                PlayerRig = "rbxassetid://116039506373774";
-            };
-            BetterIdle = "rbxassetid://138754221537146";
-            BetterWalk = "rbxassetid://131235528875091";
-            BetterRun = "rbxassetid://89252407304675";
-            Slash = "rbxassetid://83829782357897";
-            Entanglement = "rbxassetid://119181003138006";
-            UnstableEye = "rbxassetid://119429069577280";
-            RejuvenateTheRotten = "rbxassetid://116996902830888";
-            MassInfection = "rbxassetid://131430497821198";
+                KillerRig = "rbxassetid://123924093489218",
+                PlayerRig = "rbxassetid://116039506373774",
+            },
+            BetterIdle = "rbxassetid://138754221537146",
+            BetterWalk = "rbxassetid://131235528875091",
+            BetterRun = "rbxassetid://89252407304675",
+            Slash = "rbxassetid://83829782357897",
+            Entanglement = "rbxassetid://119181003138006",
+            UnstableEye = "rbxassetid://119429069577280",
+            RejuvenateTheRotten = "rbxassetid://116996902830888",
+            MassInfection = "rbxassetid://131430497821198",
             Stunned = {
-                Start = "rbxassetid://96642629473615";
-                Loop = "rbxassetid://131392439047269";
-                End = "rbxassetid://121164654140845";
-            };
+                Start = "rbxassetid://96642629473615",
+                Loop = "rbxassetid://131392439047269",
+                End = "rbxassetid://121164654140845",
+            },
             Victory = {
-                KillerRig = "rbxassetid://137889266669216";
-                CameraRig = "rbxassetid://129809576292762"; -- Игнорируется
-                ShedletskyRig = "rbxassetid://121740536645205";
-            };
-        };
+                KillerRig = "rbxassetid://137889266669216",
+                CameraRig = "rbxassetid://129809576292762",
+                ShedletskyRig = "rbxassetid://121740536645205",
+            },
+        },
     },
     -- Анимации c00lkidd
     ["c00lkidd"] = {
         PizzaDeliveryAnimations = {
-            Summoned = "rbxassetid://18886065814";
-            Idle = "rbxassetid://18886066950";
-            Walk = "rbxassetid://18886064499";
-            Hit = "rbxassetid://18886068630";
-        };
+            Summoned = "rbxassetid://18886065814",
+            Idle = "rbxassetid://18886066950",
+            Walk = "rbxassetid://18886064499",
+            Hit = "rbxassetid://18886068630",
+        },
         Animations = {
-            Idle = "rbxassetid://18885903667";
-            Walk = "rbxassetid://18885906143";
-            Run = "rbxassetid://96571077893813";
-            InjuredIdle = "rbxassetid://18885903667";
-            InjuredWalk = "rbxassetid://18885906143";
-            InjuredRun = "rbxassetid://96571077893813";
+            Idle = "rbxassetid://18885903667",
+            Walk = "rbxassetid://18885906143",
+            Run = "rbxassetid://96571077893813",
+            InjuredIdle = "rbxassetid://18885903667",
+            InjuredWalk = "rbxassetid://18885906143",
+            InjuredRun = "rbxassetid://96571077893813",
             Stunned = {
-                Start = "rbxassetid://109869078763813";
-                Loop = "rbxassetid://125337218572338";
-                End = "rbxassetid://83635673319417";
-            };
+                Start = "rbxassetid://109869078763813",
+                Loop = "rbxassetid://125337218572338",
+                End = "rbxassetid://83635673319417",
+            },
             Introduction = {
-                KillerRig = "rbxassetid://18924919303";
-                CameraRig = "rbxassetid://18925097303"; -- Игнорируется
-            };
+                KillerRig = "rbxassetid://18924919303",
+                CameraRig = "rbxassetid://18925097303",
+            },
             Victory = {
-                KillerRig = "rbxassetid://108042935463999";
-                KillerRigLoop = "rbxassetid://86524030996609";
-                CameraRig = "rbxassetid://78439581321137"; -- Игнорируется
-            };
+                KillerRig = "rbxassetid://108042935463999",
+                KillerRigLoop = "rbxassetid://86524030996609",
+                CameraRig = "rbxassetid://78439581321137",
+            },
             Execution = {
-                KillerRig = "rbxassetid://89669118763885";
-                PlayerRig = "rbxassetid://78051806190478";
-            };
+                KillerRig = "rbxassetid://89669118763885",
+                PlayerRig = "rbxassetid://78051806190478",
+            },
             Execution007n7 = {
-                KillerRig = "rbxassetid://133688616073016";
-                PlayerRig = "rbxassetid://132293609857524";
-            };
-            Attack = "rbxassetid://18885909645";
-            CorruptNature = "rbxassetid://18885919947";
-            SummonPizzaDelivery = "rbxassetid://18885915433";
-            WalkspeedOverrideStart = "rbxassetid://98456918873918";
-            WalkspeedOverrideLoop = "rbxassetid://106776364623742";
-            WalkspeedOverrideHit = "rbxassetid://18885937766";
-            WalkspeedOverrideMiss = "rbxassetid://18885940850";
-        };
+                KillerRig = "rbxassetid://133688616073016",
+                PlayerRig = "rbxassetid://132293609857524",
+            },
+            Attack = "rbxassetid://18885909645",
+            CorruptNature = "rbxassetid://18885919947",
+            SummonPizzaDelivery = "rbxassetid://18885915433",
+            WalkspeedOverrideStart = "rbxassetid://98456918873918",
+            WalkspeedOverrideLoop = "rbxassetid://106776364623742",
+            WalkspeedOverrideHit = "rbxassetid://18885937766",
+            WalkspeedOverrideMiss = "rbxassetid://18885940850",
+        },
     },
     -- Анимации Noli
     ["Noli"] = {
         Animations = {
-            Idle = "rbxassetid://83465205704188";
-            Walk = "rbxassetid://109700476007435";
-            Run = "rbxassetid://117451341682452";
-            InjuredIdle = "rbxassetid://83465205704188";
-            InjuredWalk = "rbxassetid://109700476007435";
-            InjuredRun = "rbxassetid://117451341682452";
-            Stab = "rbxassetid://109230267448394";
+            Idle = "rbxassetid://83465205704188",
+            Walk = "rbxassetid://109700476007435",
+            Run = "rbxassetid://117451341682452",
+            InjuredIdle = "rbxassetid://83465205704188",
+            InjuredWalk = "rbxassetid://109700476007435",
+            InjuredRun = "rbxassetid://117451341682452",
+            Stab = "rbxassetid://109230267448394",
             Victory = {
-                KillerRig = "rbxassetid://89207009102595";
-                CameraRig = "rbxassetid://92599409662127"; -- Игнорируется
-            };
+                KillerRig = "rbxassetid://89207009102595",
+                CameraRig = "rbxassetid://92599409662127",
+            },
             VoidRush = {
-                StartCharge = "rbxassetid://91758760621955";
-                LoopCharge = "rbxassetid://93841120533318";
-                CancelCharge = "rbxassetid://91758760621955";
-                StartDashInit = "rbxassetid://139835501033932";
-                LoopDashInit = "rbxassetid://126896426760253";
-                StartDashCombo = "rbxassetid://114356208094580";
-                LoopDashCombo = "rbxassetid://135884061951801";
-                EndDash = "rbxassetid://139321362207112";
-                EndDashCrashed = "rbxassetid://94039555054855";
-                EndDashNonChar = "rbxassetid://94039555054855";
-                WeakHit = "rbxassetid://92243093913547";
-                CutsceneKillerRig = "rbxassetid://81533966558979";
-            };
-            VoidRushVictimRig = "rbxassetid://134053005930385";
-            NovaThrow = "rbxassetid://107339108383093";
-            NovaDet = "rbxassetid://125504560920616";
-            ObservantStart = "rbxassetid://113357690193035";
-            ObservantLoop = "rbxassetid://104744456957363";
-            ObservantTeleport = "rbxassetid://140042539182927";
-            Hallucination = "rbxassetid://140042539182927";
+                StartCharge = "rbxassetid://91758760621955",
+                LoopCharge = "rbxassetid://93841120533318",
+                CancelCharge = "rbxassetid://91758760621955",
+                StartDashInit = "rbxassetid://139835501033932",
+                LoopDashInit = "rbxassetid://126896426760253",
+                StartDashCombo = "rbxassetid://114356208094580",
+                LoopDashCombo = "rbxassetid://135884061951801",
+                EndDash = "rbxassetid://139321362207112",
+                EndDashCrashed = "rbxassetid://94039555054855",
+                EndDashNonChar = "rbxassetid://94039555054855",
+                WeakHit = "rbxassetid://92243093913547",
+                CutsceneKillerRig = "rbxassetid://81533966558979",
+            },
+            VoidRushVictimRig = "rbxassetid://134053005930385",
+            NovaThrow = "rbxassetid://107339108383093",
+            NovaDet = "rbxassetid://125504560920616",
+            ObservantStart = "rbxassetid://113357690193035",
+            ObservantLoop = "rbxassetid://104744456957363",
+            ObservantTeleport = "rbxassetid://140042539182927",
+            Hallucination = "rbxassetid://140042539182927",
             Introduction = {
-                KillerRig = "rbxassetid://82002727792391";
-                CameraRig = "rbxassetid://140061272138793"; -- Игнорируется
-            };
+                KillerRig = "rbxassetid://82002727792391",
+                CameraRig = "rbxassetid://140061272138793",
+            },
             Execution = {
-                KillerRig = "rbxassetid://129491851057694";
-                PlayerRig = "rbxassetid://116544958644813";
-                PlayerCFrameOffset = CFrame.new(0, 0, -6); -- Игнорируется
-            };
+                KillerRig = "rbxassetid://129491851057694",
+                PlayerRig = "rbxassetid://116544958644813",
+                PlayerCFrameOffset = CFrame.new(0, 0, -6),
+            },
             Stunned = {
-                Start = "rbxassetid://128923537868786";
-                Loop = "rbxassetid://122580527125278";
-                End = "rbxassetid://99164529472582";
-            };
-        };
+                Start = "rbxassetid://128923537868786",
+                Loop = "rbxassetid://122580527125278",
+                End = "rbxassetid://99164529472582",
+            },
+        },
     },
-    -- Jason и JohnDoe пока пустые, как вы и просили
     ["Jason"] = { Animations = {} },
     ["JohnDoe"] = { Animations = {} },
 }
 
+-- ВСТРОЕННЫЕ ДАННЫЕ АНИМАЦИЙ ВЫЖИВШИХ
+local allSurvivorAnimations = {
+    ["JuggernautGuest"] = {
+        Animations = {
+            Block = "rbxassetid://95802026624883",
+            Charge = "rbxassetid://97623143664485",
+        },
+    },
+    ["DemomanGuest"] = {
+        Animations = {
+            Block = "rbxassetid://115706752305794",
+            Charge = "rbxassetid://97623143664485",
+            Idle = "rbxassetid://76822379808155",
+            Punch = "rbxassetid://129843313690921",
+            ParryPunch = "rbxassetid://129843313690921",
+            Walk = "rbxassetid://82697414467415",
+            Run = "rbxassetid://82697414467415",
+        },
+    },
+    ["KJGuest"] = {
+        Animations = {
+            Parry = "rbxassetid://91522546229765",
+            Ravage = "rbxassetid://88600118696353",
+            Ravage_Victim = "rbxassetid://71636405369668",
+            M1 = {"rbxassetid://71636405369668", "rbxassetid://71636405369668", "rbxassetid://71636405369668", "rbxassetid://71636405369668"},
+        },
+    },
+    ["MilestoneGuest"] = {
+        Animations = {
+            Block = "rbxassetid://96959123077498",
+            ParryPunch = "rbxassetid://86096387000557",
+        },
+    },
+	["Builderman"] = {
+		Animations = {
+		ConstructStart = "rbxassetid://135478644516351";
+		ConstructLoop = "rbxassetid://90772467802274";
+		ConstructEnd = "rbxassetid://112583398395682";
+		HatFix = "rbxassetid://133461474706559";
+		},
+	},
+	["Chance"] = {
+		Animations = {
+		FlipCoinHeads = "rbxassetid://128455891079960";
+		FlipCoinTails = "rbxassetid://88851377209988";
+		AimGun = "rbxassetid://133491532453922";
+		GunFire = "rbxassetid://90499469533503";
+		GunFail = "rbxassetid://82516682306810";
+		GunExplode = "rbxassetid://118647044497447";
+		HatFix = "rbxassetid://133461474706559";
+		},
+	},
+	["Dusekkar"] = {
+		Animations = {
+		Idle = "rbxassetid://107756518054855";
+		Walk = "rbxassetid://102812745115149";
+		Run = "rbxassetid://125869734469543";
+		InjuredIdle = "rbxassetid://138915609882599";
+		InjuredWalk = "rbxassetid://138695523464886";
+		InjuredRun = "rbxassetid://71505511479171";
+		StaffShot = "rbxassetid://77894750279891";
+		StaffStartup = "rbxassetid://92305864294317";
+		StaffLoop = "rbxassetid://81098493643721";
+		},
+	},
+	["Elliot"] = {
+		Animations = {
+		ThrowPizza = "rbxassetid://114155003741146";
+		},
+	},
+	["Noob"] = {
+		Animations = {
+		Drinking1 = "rbxassetid://124033675853489";
+		Drinking2 = "rbxassetid://96771054624545";
+		Eating = "rbxassetid://121781457295101";
+		},
+	},
+	["Shedletskty"] = {
+		Animations = {
+		Slash = "rbxassetid://116618003477002";
+		EatChicken = "rbxassetid://121781457295101";
+		},
+	},
+	["Taph"] = {
+		Animations = {
+		TripwireIdle = "rbxassetid://97339712737072";
+		TripwireWalk = "rbxassetid://123920512025716";
+		TripwireRun = "rbxassetid://123920512025716";
+		TripwirePlaceStart = "rbxassetid://130498773808198";
+		TripwirePlaceEnd = "rbxassetid://122093265676661";
+		ThrowSubspace = "rbxassetid://134027914413177";
+		},
+	},
+	["Two-Time"] = {
+		Animations = {
+		CrouchStart = "rbxassetid://98606150731314";
+		CrouchIdle = "rbxassetid://74530436512522";
+		CrouchWalk = "rbxassetid://94721495253171";
+		CrouchRun = "rbxassetid://93499989310243";
+		Stab = "rbxassetid://86545133269813";
+		LungeStart = "rbxassetid://89448354637442";
+		LungeLoop = "rbxassetid://115194624791339";
+		LungeEnd = "rbxassetid://119434518007321";
+		Ritual = "rbxassetid://117339039533356";
+		},
+	},
+}
 
 -- Управление состоянием
 local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack?, sound: Sound?, stoppedConnection: RBXScriptConnection?}} = {}
 local isMovementDisabled: boolean = false
 local currentCategory = "Emotes" -- Категория по умолчанию
-local currentSubCategory = nil -- Текущая выбранная подкатегория внутри "Animations"
+local currentSubCategory = nil -- Текущая выбранная подкатегория внутри "Killer Animations" или "Survivors Animations"
 
 -- Хранит все загруженные конфигурации и кнопки по категориям
 local categoryData = {
@@ -274,9 +379,21 @@ local categoryData = {
         uiListLayout = nil,
         buttonNameCache = {}
     },
-    Animations = {
-        folder = nil, -- Больше не сканируем папку, данные хардкодируются
-        subCategories = {}, -- Теперь здесь будут данные из allKillerAnimations
+    ["Killer Animations"] = {
+        folder = nil,
+        dataSource = allKillerAnimations,
+        subCategories = {},
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {},
+        currentSubCategoryFrame = nil,
+        currentSubCategoryLayout = nil,
+    },
+    ["Survivors Animations"] = {
+        folder = nil,
+        dataSource = allSurvivorAnimations,
+        subCategories = {},
         buttons = {},
         scrollingFrame = nil,
         uiListLayout = nil,
@@ -317,7 +434,6 @@ mainFrame.Visible = false
 mainFrame.Active = true
 mainFrame.Draggable = true
 
--- Контейнер кнопок категорий
 local categoryButtonsFrame = Instance.new("Frame")
 categoryButtonsFrame.Name = "CategoryButtons"
 categoryButtonsFrame.Parent = mainFrame
@@ -334,7 +450,6 @@ uiListLayoutCategories.VerticalAlignment = Enum.VerticalAlignment.Center
 uiListLayoutCategories.Padding = UDim.new(0, 5)
 uiListLayoutCategories.SortOrder = Enum.SortOrder.LayoutOrder
 
--- Элементы поиска
 local searchButton = Instance.new("TextButton")
 searchButton.Name = "SearchButton"
 searchButton.Parent = mainFrame
@@ -364,7 +479,6 @@ searchTextBox.ZIndex = 2
 
 --- Основные функции ---
 
--- Функция для сброса движения игрока к значениям по умолчанию
 local function resetPlayerMovement()
     if humanoid and isMovementDisabled then
         humanoid.WalkSpeed = 16
@@ -373,7 +487,6 @@ local function resetPlayerMovement()
     end
 end
 
--- Функция для остановки конкретной эмоции для данного гуманоида (используется только для локального игрока сейчас)
 local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
     local emoteData = activeEmotes[targetHumanoid]
     if emoteData then
@@ -386,13 +499,12 @@ local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
         end
         if emoteData.sound then
             emoteData.sound:Stop()
-            emoteData.sound:Destroy() -- Удаляем экземпляр звука
+            emoteData.sound:Destroy()
         end
         activeEmotes[targetHumanoid] = nil
     end
 end
 
--- Функция для остановки всех воспроизводимых в данный момент эмоций и сброса состояния игрока
 local function stopAllEmotes()
     if humanoid then
         stopEmoteForHumanoid(humanoid)
@@ -401,8 +513,6 @@ local function stopAllEmotes()
     resetPlayerMovement()
 end
 
--- Локальная функция для воспроизведения анимации (только на стороне клиента для мгновенной обратной связи)
--- Включает поддержку для таблиц AssetID (случайный выбор) и SFX
 local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: any, sfxIdOrTable: any, sfxProperties: {Looped: boolean?}, characterModel: Model)
     stopEmoteForHumanoid(targetHumanoid)
 
@@ -410,14 +520,12 @@ local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: 
     if type(animationIdOrTable) == "table" then
         if #animationIdOrTable > 0 then
             animationIdToPlay = animationIdOrTable[math.random(1, #animationIdOrTable)]
-            print("DEBUG: Случайно выбранный AnimationId (из таблицы):", animationIdToPlay)
         else
             warn("DEBUG: animationIdOrTable является пустой таблицей. Невозможно воспроизвести анимацию.")
             return
         end
     elseif type(animationIdOrTable) == "string" then
         animationIdToPlay = animationIdOrTable
-        print("DEBUG: Используем AnimationId (из строки):", animationIdToPlay)
     else
         warn("DEBUG: Недопустимый тип для animationIdOrTable. Ожидалась строка или таблица, получено", type(animationIdOrTable))
         return
@@ -432,19 +540,15 @@ local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: 
 
     local soundAttachmentPart = nil
     if sfxIdOrTable and characterModel then
-        print("DEBUG: Пытаемся найти часть для прикрепления звука для characterModel:", characterModel.Name)
-
         local chosenSfxId: string
         if type(sfxIdOrTable) == "table" then
             if #sfxIdOrTable > 0 then
                 chosenSfxId = sfxIdOrTable[math.random(1, #sfxIdOrTable)]
-                print("DEBUG: Случайно выбранный SFXId (из таблицы):", chosenSfxId)
             else
                 warn("DEBUG: sfxIdOrTable является пустой таблицей. Звук не будет воспроизводиться.")
             end
         elseif type(sfxIdOrTable) == "string" then
             chosenSfxId = sfxIdOrTable
-            print("DEBUG: Используем SFXId (из строки):", chosenSfxId)
         else
             warn("DEBUG: Недопустимый тип для sfxIdOrTable. Ожидалась строка или таблица, получено", type(sfxIdOrTable))
         end
@@ -456,13 +560,10 @@ local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: 
 
             if success and rootPartResult then
                 soundAttachmentPart = rootPartResult
-                print("DEBUG: HumanoidRootPart успешно найдена для", characterModel.Name)
             else
                 warn(string.format("DEBUG: HumanoidRootPart НЕ найдена для модели '%s' в течение 10 секунд! Пытаемся использовать альтернативу (UpperTorso/Torso).", characterModel.Name))
                 soundAttachmentPart = characterModel:FindFirstChild("UpperTorso") or characterModel:FindFirstChild("Torso")
-                if soundAttachmentPart then
-                    print(string.format("DEBUG: Успешно найдена альтернативная часть для прикрепления звука (%s) для %s.", soundAttachmentPart.Name, characterModel.Name))
-                else
+                if not soundAttachmentPart then
                     warn(string.format("DEBUG: Ни HumanoidRootPart, ни UpperTorso, ни Torso не найдены для модели '%s'! Звук не будет воспроизводиться.", characterModel.Name))
                 end
             end
@@ -501,17 +602,13 @@ local function playLocalAnimation(targetHumanoid: Humanoid, animationIdOrTable: 
     end)
 end
 
-
--- Функция для обновления размера холста ScrollingFrame для данной категории
 local function updateCanvasSize(targetFrame: ScrollingFrame, targetLayout: UIListLayout)
     if not targetFrame or not targetLayout then return end
-
-    task.wait(0.1) -- Небольшая задержка, чтобы UIListLayout успел обновиться
+    task.wait(0.1)
     local contentSize = targetLayout.AbsoluteContentSize
     targetFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
 end
 
--- Функция для фильтрации кнопок эмоций/анимаций на основе текста поиска для текущей активной панели
 local function filterButtons(searchText: string)
     local lowerSearchText = searchText:lower()
     local targetButtons = nil
@@ -522,23 +619,22 @@ local function filterButtons(searchText: string)
         targetButtons = categoryData.Emotes.buttons
         targetScrollingFrame = categoryData.Emotes.scrollingFrame
         targetUIListLayout = categoryData.Emotes.uiListLayout
-    elseif currentCategory == "Animations" then
+    elseif currentCategory == "Killer Animations" or currentCategory == "Survivors Animations" then
+        local animData = categoryData[currentCategory]
         if currentSubCategory then
-            -- Если выбрана подкатегория, фильтруем ее кнопки
-            targetButtons = categoryData.Animations.subCategories[currentSubCategory].buttons
-            targetScrollingFrame = categoryData.Animations.currentSubCategoryFrame
-            targetUIListLayout = categoryData.Animations.currentSubCategoryLayout
+            targetButtons = animData.subCategories[currentSubCategory].buttons
+            targetScrollingFrame = animData.currentSubCategoryFrame
+            targetUIListLayout = animData.currentSubCategoryLayout
         else
-            -- Если нет подкатегории, фильтруем кнопки подкатегорий
-            targetButtons = categoryData.Animations.buttons
-            targetScrollingFrame = categoryData.Animations.scrollingFrame
-            targetUIListLayout = categoryData.Animations.uiListLayout
+            targetButtons = animData.buttons
+            targetScrollingFrame = animData.scrollingFrame
+            targetUIListLayout = animData.uiListLayout
         end
     end
 
     if not targetButtons then return end
 
-    for name, button in pairs(targetButtons) do
+    for _, button in pairs(targetButtons) do
         local buttonText = button.Text:lower()
         if string.find(buttonText, lowerSearchText) then
             button.Visible = true
@@ -552,31 +648,21 @@ local function filterButtons(searchText: string)
     end
 end
 
--- Функция для проверки, является ли данная анимация "камерой"
 local function isCameraAnimation(animData: any)
     if type(animData) ~= "table" then return false end
-    -- Проверяем, содержит ли таблица ключи, указывающие на анимацию камеры.
-    -- Это может быть CameraRig или Camera, или KillerRig + CameraRig.
     if animData.CameraRig or animData.Camera then return true end
-    -- Если это таблица с KillerRig, но без PlayerRig, это часто относится к катсценам/камере
     if animData.KillerRig and not animData.PlayerRig then return true end
-    -- Дополнительно: если есть PlayerCFrameOffset, это тоже не прямая анимация для игрока
     if animData.PlayerCFrameOffset then return true end
-
     return false
 end
 
--- Рекурсивная функция для создания кнопок анимаций из таблицы данных
--- В эту функцию передается имя "киллера" (например, "1x1x1x1")
-local function createAnimationButtonsRecursive(parentFrame: ScrollingFrame, parentLayout: UIListLayout, animationTable: table, killerName: string)
+local function createAnimationButtonsRecursive(parentFrame: ScrollingFrame, parentLayout: UIListLayout, animationTable: table, characterName: string, targetCategory: string)
     for animName, animValue in pairs(animationTable) do
-        -- Игнорируем специфические поля из ваших модулей, которые не являются AssetID
         if animName == "IntroLighting" or animName == "OutroLighting" or animName == "IntroSky" then
             continue
         end
 
-        if type(animValue) == "string" and string.find(animValue, "rbxassetid://") then
-            -- Это прямая анимация (AssetID)
+        if (type(animValue) == "string" and string.find(animValue, "rbxassetid://")) or (type(animValue) == "table" and #animValue > 0 and type(animValue[1]) == "string") then
             local button = Instance.new("TextButton")
             button.Name = animName .. "Button"
             button.Parent = parentFrame
@@ -584,36 +670,28 @@ local function createAnimationButtonsRecursive(parentFrame: ScrollingFrame, pare
             button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
             button.BorderColor3 = Color3.fromRGB(255, 255, 255)
             button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            button.Text = animName -- Отображаем имя анимации (например, "Idle", "Walk")
+            button.Text = animName
             button.Font = Enum.Font.SourceSansBold
             button.TextSize = 18
 
             button.MouseButton1Click:Connect(function()
                 if humanoid and character then
-                    -- Воспроизводим анимацию. Предполагаем, что нет SFX или SFXProperties для этих.
                     playLocalAnimation(humanoid, animValue, nil, nil, character)
                 else
                     warn("DEBUG: Невозможно воспроизвести анимацию, гуманоид или персонаж равен nil.")
                 end
             end)
-            -- Добавляем кнопку в кэш подкатегории для фильтрации
-            table.insert(categoryData.Animations.subCategories[killerName].buttons, button)
+            table.insert(categoryData[targetCategory].subCategories[characterName].buttons, button)
         elseif type(animValue) == "table" and not isCameraAnimation(animValue) then
-            -- Это вложенная таблица, и это НЕ анимация камеры. Рекурсивно создаем кнопки для нее.
-            -- Мы пропускаем создание отдельной кнопки для самой вложенной таблицы (например, "Stunned"),
-            -- а создаем кнопки для ее дочерних элементов ("Start", "Loop", "End").
-            createAnimationButtonsRecursive(parentFrame, parentLayout, animValue, killerName)
+            createAnimationButtonsRecursive(parentFrame, parentLayout, animValue, characterName, targetCategory)
         end
     end
 end
 
-
--- Функция для создания кнопок для основной категории (Emotes, Animations)
 local function createCategoryButtons(categoryName: string, folder: Folder?)
     local currentCategoryData = categoryData[categoryName]
     if not currentCategoryData then return end
 
-    -- Очищаем существующие кнопки и кэши для этой категории
     for _, button in pairs(currentCategoryData.buttons) do
         button:Destroy()
     end
@@ -622,21 +700,16 @@ local function createCategoryButtons(categoryName: string, folder: Folder?)
     currentCategoryData.buttonNameCache = {}
 
     if categoryName == "Emotes" then
-        if not folder then
-            warn("DEBUG: Emotes folder is nil. Skipping emote button creation.")
-            return
-        end
+        if not folder then return end
         for _, emoteConfigModule in pairs(folder:GetChildren()) do
             if emoteConfigModule:IsA("ModuleScript") then
                 local success, emoteData = pcall(require, emoteConfigModule)
                 if success and emoteData.AssetID then
-                    local buttonText = emoteData.DisplayName or (type(emoteData.AssetID) == "string" and emoteData.AssetID or "Эмоция")
-
+                    local buttonText = emoteData.DisplayName or "Эмоция"
                     if currentCategoryData.buttonNameCache[buttonText] then
-                        warn(string.format("DEBUG: Обнаружена дублирующая кнопка эмоции '%s' в категории '%s'. Пропускаем ее.", buttonText, categoryName))
+                        warn(string.format("DEBUG: Обнаружена дублирующая кнопка эмоции '%s'. Пропускаем.", buttonText))
                         continue
                     end
-
                     currentCategoryData.buttonNameCache[buttonText] = true
 
                     local button = Instance.new("TextButton")
@@ -657,53 +730,44 @@ local function createCategoryButtons(categoryName: string, folder: Folder?)
                             warn("DEBUG: Невозможно воспроизвести эмоцию, гуманоид или персонаж равен nil.")
                         end
                     end)
-
                     currentCategoryData.buttons[buttonText] = button
                     table.insert(currentCategoryData.configs, emoteData)
-                else
-                    warn("DEBUG: Не удалось загрузить модуль эмоции или отсутствует AssetID в папке '%s':", categoryName, emoteConfigModule.Name)
                 end
             end
         end
         updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
 
-    elseif categoryName == "Animations" then
-        -- Для "Animations" мы теперь используем встроенные данные allKillerAnimations
-        for killerName, killerData in pairs(allKillerAnimations) do
-            -- Создаем данные для этой подкатегории (например, "1x1x1x1")
-            currentCategoryData.subCategories[killerName] = {
-                data = killerData, -- Хранит встроенные данные
-                buttons = {}, -- Будут кнопки анимаций для этой подкатегории
+    elseif categoryName == "Killer Animations" or categoryName == "Survivors Animations" then
+        local dataSource = currentCategoryData.dataSource
+        for characterName, characterData in pairs(dataSource) do
+            currentCategoryData.subCategories[characterName] = {
+                data = characterData,
+                buttons = {},
                 scrollingFrame = nil,
                 uiListLayout = nil,
                 buttonNameCache = {}
             }
 
-            -- Создаем кнопку для подкатегории (например, "1x1x1x1")
             local subCategoryButton = Instance.new("TextButton")
-            subCategoryButton.Name = killerName .. "SubCategoryButton"
+            subCategoryButton.Name = characterName .. "SubCategoryButton"
             subCategoryButton.Parent = currentCategoryData.scrollingFrame
             subCategoryButton.Size = UDim2.new(1, -10, 0, 40)
             subCategoryButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
             subCategoryButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
             subCategoryButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            subCategoryButton.Text = killerName
+            subCategoryButton.Text = characterName
             subCategoryButton.Font = Enum.Font.SourceSansBold
             subCategoryButton.TextSize = 18
-            currentCategoryData.buttons[killerName] = subCategoryButton
+            currentCategoryData.buttons[characterName] = subCategoryButton
 
             subCategoryButton.MouseButton1Click:Connect(function()
-                -- Скрываем основной ScrollingFrame "Animations"
                 currentCategoryData.scrollingFrame.Visible = false
-                currentSubCategory = killerName
+                currentSubCategory = characterName
 
-                -- Создаем или показываем ScrollingFrame для этой подкатегории
-                local subCatFrame = currentCategoryData.subCategories[killerName].scrollingFrame
-                local subCatLayout = currentCategoryData.subCategories[killerName].uiListLayout
-
+                local subCatFrame = currentCategoryData.subCategories[characterName].scrollingFrame
                 if not subCatFrame then
                     subCatFrame = Instance.new("ScrollingFrame")
-                    subCatFrame.Name = killerName .. "AnimationsContainer"
+                    subCatFrame.Name = characterName .. "AnimationsContainer"
                     subCatFrame.Parent = mainFrame
                     subCatFrame.Size = UDim2.new(1, 0, 1, -80)
                     subCatFrame.Position = UDim2.new(0, 0, 0, 80)
@@ -711,64 +775,35 @@ local function createCategoryButtons(categoryName: string, folder: Folder?)
                     subCatFrame.BorderSizePixel = 0
                     subCatFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
                     subCatFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
-                    subCatFrame.Visible = true
 
-                    subCatLayout = Instance.new("UIListLayout")
+                    local subCatLayout = Instance.new("UIListLayout")
                     subCatLayout.Parent = subCatFrame
                     subCatLayout.Padding = UDim.new(0, 5)
                     subCatLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-                    currentCategoryData.subCategories[killerName].scrollingFrame = subCatFrame
-                    currentCategoryData.subCategories[killerName].uiListLayout = subCatLayout
+                    currentCategoryData.subCategories[characterName].scrollingFrame = subCatFrame
+                    currentCategoryData.subCategories[characterName].uiListLayout = subCatLayout
 
-                    -- Теперь создаем кнопки для анимаций внутри этого встроенного набора данных
-                    if killerData.ZombieAnimations then
-                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.ZombieAnimations, killerName)
+                    if characterData.ZombieAnimations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, characterData.ZombieAnimations, characterName, categoryName)
                     end
-                    if killerData.Animations then
-                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.Animations, killerName)
+                    if characterData.Animations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, characterData.Animations, characterName, categoryName)
                     end
-                    if killerData.PizzaDeliveryAnimations then
-                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.PizzaDeliveryAnimations, killerName)
+                    if characterData.PizzaDeliveryAnimations then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, characterData.PizzaDeliveryAnimations, characterName, categoryName)
                     end
-                    if killerData.VoidRush then
-                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, killerData.VoidRush, killerName)
+                    if characterData.VoidRush then
+                        createAnimationButtonsRecursive(subCatFrame, subCatLayout, characterData.VoidRush, characterName, categoryName)
                     end
-                    for k, v in pairs(killerData) do
-                        if type(v) == "string" and string.find(v, "rbxassetid://") and not isCameraAnimation(v) then
-                             -- Создать кнопку для этой top-level анимации
-                            local button = Instance.new("TextButton")
-                            button.Name = k .. "Button"
-                            button.Parent = subCatFrame
-                            button.Size = UDim2.new(1, -10, 0, 40)
-                            button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                            button.BorderColor3 = Color3.fromRGB(255, 255, 255)
-                            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                            button.Text = k
-                            button.Font = Enum.Font.SourceSansBold
-                            button.TextSize = 18
-                            button.MouseButton1Click:Connect(function()
-                                if humanoid and character then
-                                    playLocalAnimation(humanoid, v, nil, nil, character)
-                                else
-                                    warn("DEBUG: Невозможно воспроизвести анимацию, гуманоид или персонаж равен nil.")
-                                end
-                            end)
-                            table.insert(currentCategoryData.subCategories[killerName].buttons, button)
-                        end
-                    end
-
-
-                else
-                    subCatFrame.Visible = true
                 end
 
+                subCatFrame.Visible = true
                 currentCategoryData.currentSubCategoryFrame = subCatFrame
-                currentCategoryData.currentSubCategoryLayout = subCatLayout
+                currentCategoryData.currentSubCategoryLayout = subCatFrame:FindFirstChildOfClass("UIListLayout")
 
-                -- Обновляем размер холста для новой подкатегории
-                updateCanvasSize(subCatFrame, subCatLayout)
-                searchTextBox.Text = "" -- Сбрасываем поиск при смене подкатегории
+                updateCanvasSize(subCatFrame, currentCategoryData.currentSubCategoryLayout)
+                searchTextBox.Text = ""
                 filterButtons("")
             end)
         end
@@ -776,27 +811,27 @@ local function createCategoryButtons(categoryName: string, folder: Folder?)
     end
 end
 
--- Функция для возврата из подкатегории к списку подкатегорий
 local function backToSubCategories()
-    local animData = categoryData.Animations
-    if animData.currentSubCategoryFrame then
+    local animData = categoryData[currentCategory]
+    if animData and animData.currentSubCategoryFrame then
         animData.currentSubCategoryFrame.Visible = false
         animData.currentSubCategoryFrame = nil
         animData.currentSubCategoryLayout = nil
     end
     currentSubCategory = nil
-    animData.scrollingFrame.Visible = true -- Показываем основной список подкатегорий
+    if animData and animData.scrollingFrame then
+        animData.scrollingFrame.Visible = true
+        updateCanvasSize(animData.scrollingFrame, animData.uiListLayout)
+    end
     searchTextBox.Text = ""
     filterButtons("")
-    updateCanvasSize(animData.scrollingFrame, animData.uiListLayout)
 end
 
--- Создаем кнопку "Назад" для подкатегорий
 local backButton = Instance.new("TextButton")
 backButton.Name = "BackButton"
 backButton.Parent = mainFrame
 backButton.Size = UDim2.new(0, 60, 0, 30)
-backButton.Position = UDim2.new(0, 5, 0, 45) -- Слева от поиска
+backButton.Position = UDim2.new(0, 5, 0, 45)
 backButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 backButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
 backButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -804,62 +839,48 @@ backButton.Text = "← Back"
 backButton.Font = Enum.Font.SourceSansBold
 backButton.TextSize = 14
 backButton.ZIndex = 2
-backButton.Visible = false -- Изначально скрыт
-
+backButton.Visible = false
 backButton.MouseButton1Click:Connect(backToSubCategories)
 
-
--- Функция для переключения активной категории
 local function switchToCategory(newCategoryName: string)
     if currentCategory == newCategoryName and not currentSubCategory then return end
 
-    -- Скрываем ScrollingFrame предыдущей категории
     local prevCategoryData = categoryData[currentCategory]
-    if prevCategoryData and prevCategoryData.scrollingFrame then
-        prevCategoryData.scrollingFrame.Visible = false
+    if prevCategoryData then
+        if prevCategoryData.scrollingFrame then prevCategoryData.scrollingFrame.Visible = false end
+        if prevCategoryData.currentSubCategoryFrame then
+            prevCategoryData.currentSubCategoryFrame.Visible = false
+            prevCategoryData.currentSubCategoryFrame = nil
+            prevCategoryData.currentSubCategoryLayout = nil
+        end
     end
-    -- Если была открыта подкатегория, скрываем её
-    if prevCategoryData and prevCategoryData.currentSubCategoryFrame then
-        prevCategoryData.currentSubCategoryFrame.Visible = false
-        prevCategoryData.currentSubCategoryFrame = nil
-        prevCategoryData.currentSubCategoryLayout = nil
-    end
-    currentSubCategory = nil -- Сбрасываем подкатегорию при смене основной категории
+    currentSubCategory = nil
 
-    -- Показываем ScrollingFrame новой категории
     local newCategoryData = categoryData[newCategoryName]
     if newCategoryData and newCategoryData.scrollingFrame then
         newCategoryData.scrollingFrame.Visible = true
         currentCategory = newCategoryName
 
-        -- Управляем видимостью кнопки "Назад"
-        backButton.Visible = (newCategoryName == "Animations")
+        backButton.Visible = (newCategoryName == "Killer Animations" or newCategoryName == "Survivors Animations")
 
-        -- Сбрасываем поиск и фильтр для новой категории
         searchTextBox.Text = ""
         filterButtons("")
-
-        print("DEBUG: Переключено на категорию:", newCategoryName)
-    else
-        warn("DEBUG: Попытка переключиться на несуществующую или неинициализированную категорию:", newCategoryName)
     end
 end
 
-
 --- Настройка GUI и соединения ---
 
--- Создаем ScrollingFrame и UIListLayout для каждой основной категории
 for catName, catData in pairs(categoryData) do
     local scrollingFrame = Instance.new("ScrollingFrame")
     scrollingFrame.Name = catName .. "Container"
     scrollingFrame.Parent = mainFrame
-    scrollingFrame.Size = UDim2.new(1, 0, 1, -80) -- Скорректированная высота для кнопок категорий + поиска
-    scrollingFrame.Position = UDim2.new(0, 0, 0, 80) -- Скорректированная позиция
+    scrollingFrame.Size = UDim2.new(1, 0, 1, -80)
+    scrollingFrame.Position = UDim2.new(0, 0, 0, 80)
     scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     scrollingFrame.BorderSizePixel = 0
     scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
     scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
-    scrollingFrame.Visible = false -- Изначально скрыт
+    scrollingFrame.Visible = false
 
     local uiListLayout = Instance.new("UIListLayout")
     uiListLayout.Parent = scrollingFrame
@@ -870,44 +891,43 @@ for catName, catData in pairs(categoryData) do
     catData.uiListLayout = uiListLayout
 end
 
--- Создаем кнопки выбора категорий
-local categoryButtonNames = {"Emotes", "Animations"}
+local categoryButtonNames = {"Emotes", "Killer Animations", "Survivors Animations"}
 for i, catName in ipairs(categoryButtonNames) do
     local button = Instance.new("TextButton")
     button.Name = catName .. "Tab"
     button.Parent = categoryButtonsFrame
-    button.Size = UDim2.new(1/#categoryButtonNames, -5, 1, -10) -- Распределяем по горизонтали с небольшим отступом
+    button.Size = UDim2.new(1/#categoryButtonNames, -5, 1, -10)
     button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     button.BorderColor3 = Color3.fromRGB(255, 255, 255)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Text = catName
     button.Font = Enum.Font.SourceSansBold
     button.TextSize = 18
-    button.LayoutOrder = i -- Обеспечиваем порядок с UIListLayout
+    button.LayoutOrder = i
 
     button.MouseButton1Click:Connect(function()
         switchToCategory(catName)
     end)
 end
 
--- Функция для переключения видимости панели поиска и настройки макета
 local function toggleSearchBar()
     local isVisible = searchTextBox.Visible
     searchTextBox.Visible = not isVisible
 
     local targetSf = nil
     local targetLayout = nil
+    local animData = categoryData[currentCategory]
 
     if currentCategory == "Emotes" then
-        targetSf = categoryData.Emotes.scrollingFrame
-        targetLayout = categoryData.Emotes.uiListLayout
-    elseif currentCategory == "Animations" then
+        targetSf = animData.scrollingFrame
+        targetLayout = animData.uiListLayout
+    elseif currentCategory == "Killer Animations" or currentCategory == "Survivors Animations" then
         if currentSubCategory then
-            targetSf = categoryData.Animations.currentSubCategoryFrame
-            targetLayout = categoryData.Animations.currentSubCategoryLayout
+            targetSf = animData.currentSubCategoryFrame
+            targetLayout = animData.currentSubCategoryLayout
         else
-            targetSf = categoryData.Animations.scrollingFrame
-            targetLayout = categoryData.Animations.uiListLayout
+            targetSf = animData.scrollingFrame
+            targetLayout = animData.uiListLayout
         end
     end
 
@@ -915,78 +935,61 @@ local function toggleSearchBar()
 
     if searchTextBox.Visible then
         searchTextBox:CaptureFocus()
-        targetSf.Position = UDim2.new(0, 0, 0, 115) -- Перемещаем ScrollingFrame ниже для поиска
-        targetSf.Size = UDim2.new(1, 0, 1, -115) -- Уменьшаем высоту
+        targetSf.Position = UDim2.new(0, 0, 0, 115)
+        targetSf.Size = UDim2.new(1, 0, 1, -115)
         searchTextBox.Text = ""
         filterButtons("")
     else
         searchTextBox:ReleaseFocus()
-        targetSf.Position = UDim2.new(0, 0, 0, 80) -- Перемещаем ScrollingFrame обратно
-        targetSf.Size = UDim2.new(1, 0, 1, -80) -- Восстанавливаем высоту
+        targetSf.Position = UDim2.new(0, 0, 0, 80)
+        targetSf.Size = UDim2.new(1, 0, 1, -80)
         filterButtons("")
     end
     updateCanvasSize(targetSf, targetLayout)
 end
 
--- Функция для переключения видимости меню эмоций
 local function toggleMenu()
     mainFrame.Visible = not mainFrame.Visible
     openButton.Text = mainFrame.Visible and "Close Menu" or "Open Menu"
     if mainFrame.Visible then
-        -- При открытии меню убедимся, что показана категория по умолчанию
-        switchToCategory("Emotes") -- Или любая другая по умолчанию
+        switchToCategory("Emotes")
     else
-        -- Если закрываем меню, также закрываем строку поиска
         if searchTextBox.Visible then
             toggleSearchBar()
         end
-        -- Скрываем кнопку "Назад", если меню закрыто
         backButton.Visible = false
     end
 end
 
--- Подключаем кнопку открытия
 openButton.MouseButton1Click:Connect(toggleMenu)
-
--- Подключаем кнопку поиска
 searchButton.MouseButton1Click:Connect(toggleSearchBar)
 
--- Подключаем событие .Changed текстового поля поиска
 searchTextBox.Changed:Connect(function(property)
     if property == "Text" then
         filterButtons(searchTextBox.Text)
     end
 end)
 
--- Подключаем событие .FocusLost текстового поля поиска (например, при нажатии Enter или клике в сторону)
 searchTextBox.FocusLost:Connect(function(enterPressed)
     if enterPressed then
         filterButtons(searchTextBox.Text)
     end
 end)
 
--- Обработка обновлений персонажа игрока
-local function setupHumanoidConnections(targetHumanoid: Humanoid)
-end
-
 local function handleCharacterSetup(newCharacter: Model)
-    print("DEBUG: Персонаж загружен:", newCharacter.Name)
     local success, newHumanoid = pcall(function()
         return newCharacter:WaitForChild("Humanoid", 10)
     end)
     if success and newHumanoid then
         humanoid = newHumanoid
         originalJumpPower = humanoid.JumpPower or 50
-        print("DEBUG: Гуманоид игрока найден для нового персонажа:", humanoid.Name)
-        setupHumanoidConnections(humanoid)
         stopAllEmotes()
     else
         humanoid = nil
-        warn("DEBUG: Гуманоид не найден в новой модели персонажа:", newCharacter.Name, "после 10 секунд.")
+        warn("DEBUG: Гуманоид не найден в новой модели персонажа:", newCharacter.Name)
     end
 end
 
--- Слушаем изменения персонажа
 player.CharacterAdded:Connect(function(char)
     character = char
     handleCharacterSetup(char)
@@ -997,13 +1000,11 @@ if player.Character then
     handleCharacterSetup(character)
 end
 
--- Останавливаем все эмоции при нажатии Пробела и отключаем прыжок
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
 
     if input.KeyCode == Enum.KeyCode.Space then
         stopAllEmotes()
-
         if humanoid then
             originalJumpPower = humanoid.JumpPower or 50
             humanoid.JumpPower = 0
@@ -1018,7 +1019,6 @@ end)
 
 UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
     if gameProcessedEvent then return end
-
     if input.KeyCode == Enum.KeyCode.Space then
         if humanoid then
             humanoid.JumpPower = originalJumpPower
@@ -1026,15 +1026,15 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
     end
 end)
 
--- Начальное заполнение кнопок эмоций для всех категорий
--- Folder для Emotes передаем, для Animations - nil, т.к. данные встроены
+-- Начальное заполнение кнопок
 createCategoryButtons("Emotes", emotesFolder)
-createCategoryButtons("Animations", nil) -- Передаем nil, т.к. данные уже в скрипте
+createCategoryButtons("Killer Animations", nil)
+createCategoryButtons("Survivors Animations", nil)
 
 -- Устанавливаем начальную видимую категорию
 switchToCategory("Emotes")
 
-print("DEBUG: Скрипт эмоций успешно загружен с категориями и встроенными анимациями.")
+print("DEBUG: Скрипт эмоций успешно загружен.")
 ]]
 
 -- === ОБРАБОТКА КНОПКИ ПОДТВЕРЖДЕНИЯ КЛЮЧА ===
