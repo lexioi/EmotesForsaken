@@ -1,5 +1,5 @@
 -- === НАСТРОЙКА КЛЮЧА ===
-local validKey = "Update!! "
+local validKey = "Update!!"
 local linkToCopy = "https://discord.gg/Nc49qSdZ" -- замените на нужную ссылку
 
 -- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
