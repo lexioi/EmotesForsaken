@@ -148,11 +148,8 @@ local allKillerAnimations = {
                 Loop = "rbxassetid://131392439047269",
                 End = "rbxassetid://121164654140845",
             },
-            Victory = {
-                KillerRig = "rbxassetid://137889266669216",
-                CameraRig = "rbxassetid://129809576292762",
-                ShedletskyRig = "rbxassetid://121740536645205",
-            },
+            Victory = "rbxassetid://137889266669216",
+            VictoryShed = "rbxassetid://121740536645205",
         },
     },
     -- Анимации c00lkidd
@@ -175,15 +172,9 @@ local allKillerAnimations = {
                 Loop = "rbxassetid://125337218572338",
                 End = "rbxassetid://83635673319417",
             },
-            Introduction = {
-                KillerRig = "rbxassetid://18924919303",
-                CameraRig = "rbxassetid://18925097303",
-            },
-            Victory = {
-                KillerRig = "rbxassetid://108042935463999",
-                KillerRigLoop = "rbxassetid://86524030996609",
-                CameraRig = "rbxassetid://78439581321137",
-            },
+            Introduction = "rbxassetid://18924919303",
+            Victory = "rbxassetid://108042935463999",
+            VictoryLoop = "rbxassetid://86524030996609",
             Execution = {
                 KillerRig = "rbxassetid://89669118763885",
                 PlayerRig = "rbxassetid://78051806190478",
@@ -211,10 +202,7 @@ local allKillerAnimations = {
             InjuredWalk = "rbxassetid://109700476007435",
             InjuredRun = "rbxassetid://117451341682452",
             Stab = "rbxassetid://109230267448394",
-            Victory = {
-                KillerRig = "rbxassetid://89207009102595",
-                CameraRig = "rbxassetid://92599409662127",
-            },
+            Victory = "rbxassetid://89207009102595",
             VoidRush = {
                 StartCharge = "rbxassetid://91758760621955",
                 LoopCharge = "rbxassetid://93841120533318",
@@ -236,10 +224,7 @@ local allKillerAnimations = {
             ObservantLoop = "rbxassetid://104744456957363",
             ObservantTeleport = "rbxassetid://140042539182927",
             Hallucination = "rbxassetid://140042539182927",
-            Introduction = {
-                KillerRig = "rbxassetid://82002727792391",
-                CameraRig = "rbxassetid://140061272138793",
-            },
+            Introduction = "rbxassetid://82002727792391",
             Execution = {
                 KillerRig = "rbxassetid://129491851057694",
                 PlayerRig = "rbxassetid://116544958644813",
@@ -251,8 +236,63 @@ local allKillerAnimations = {
             },
         },
     },
-    ["Jason"] = { Animations = {} },
-    ["JohnDoe"] = { Animations = {} },
+    ["Jason"] = {
+        Animations = {
+            Idle = "rbxassetid://116050994905421",
+            Walk = "rbxassetid://93622022596108",
+            Run = "rbxassetid://93054787145505",
+            InjuredIdle = "rbxassetid://116050994905421",
+            InjuredWalk = "rbxassetid://93622022596108",
+            InjuredRun = "rbxassetid://93054787145505",
+            EnragedStart = "rbxassetid://85591573377728",
+            EnragedIdle = "rbxassetid://109875321916742",
+            EnragedWalk = "rbxassetid://86451881483688",
+            EnragedRun = "rbxassetid://93054787145505",
+            Introduction = "rbxassetid://73797519945529",
+            Victory = "rbxassetid://83786820541907",
+            Execution = {
+                KillerRig = "rbxassetid://129546372182752",
+                PlayerRig = "rbxassetid://71908227364423"
+            },
+            Stunned = {
+                Start = "rbxassetid://84525150536125",
+                Loop = "rbxassetid://75595031025056",
+                End = "rbxassetid://125119944753086"
+            },
+            Slash = "rbxassetid://126830014841198",
+            Behead = "rbxassetid://126355327951215",
+            GashingWoundStart = "rbxassetid://121086746534252",
+            GashingWound = {
+                KillerRig = "rbxassetid://101736016625776",
+                PlayerRig = "rbxassetid://109845134167647"
+            }
+        }
+    },
+    ["JohnDoe"] = {
+        Animations = {
+            Idle = "rbxassetid://105880087711722",
+            Walk = "rbxassetid://81193817424328",
+            Run = "rbxassetid://132653655520682",
+            InjuredIdle = "rbxassetid://105880087711722",
+            InjuredWalk = "rbxassetid://81193817424328",
+            InjuredRun = "rbxassetid://132653655520682",
+            Stunned = {
+                Start = "rbxassetid://95998575259602",
+                Loop = "rbxassetid://113999568620448",
+                End = "rbxassetid://102030137400786",
+                Cancel = "rbxassetid://93758847362442"
+            },
+            Execution = {
+                KillerRig = "rbxassetid://83251433279852",
+                PlayerRig = "rbxassetid://95716232259748",
+            },
+            Slash = "rbxassetid://105458270463374",
+            CorruptEnergy = "rbxassetid://127172483138092",
+            DigitalFootprint = "rbxassetid://86758834842420",
+            Introduction = "rbxassetid://93871230063034",
+            Victory = "rbxassetid://125305739659347"
+        }
+    }
 }
 
 local allKillerSkinAnimations = {
@@ -1203,6 +1243,22 @@ UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
         end
     end
 end)
+
+humanoid.StateChanged:Connect(function(oldState, newState)
+    if newState == Enum.HumanoidStateType.Jumping then
+        if activeEmotes[humanoid] then
+            print("DEBUG: Обнаружен прыжок. Остановка текущей анимации.")
+            stopEmoteForHumanoid(humanoid)
+        end
+    end
+end)
+
+-- Делает все кнопки прозрачными и продолжает следить за новыми
+local function makeButtonTransparent(button)
+	if button:IsA("TextButton") then
+		button.BackgroundTransparency = 0.4
+	end
+end
 
 -- Начальное заполнение кнопок
 createCategoryButtons("Emotes", emotesFolder)
