@@ -1,6 +1,6 @@
 -- === НАСТРОЙКА КЛЮЧА ===
 local validKey = "Roblox_Egor"
-local linkToCopy = "https://discord.gg/kus9P2ws" -- замените на нужную ссылку
+local linkToCopy = "https://discord.gg/XMNNPBa8FV" -- замените на нужную ссылку
 
 -- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
 local Players = game:GetService("Players")
