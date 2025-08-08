@@ -298,6 +298,34 @@ local allKillerAnimations = {
 local allKillerSkinAnimations = {
 ["Jason"] = {
     Animations = {
+            Purser_Idle = "rbxassetid://94895464960972",
+    Purser_Walk = "rbxassetid://100206079439305",
+    Purser_Run = "rbxassetid://138660433982140",
+    Purser_Introduction = "rbxassetid://70782816210619",
+    Purser_IntroductionMolly = "rbxassetid://119351717281573",
+    Purser_IntroductionElliot = "rbxassetid://118795597134269",
+    Purser_IntroductionNoob = "rbxassetid://79854604293983",
+    Purser_Stunned = {
+        Start = "rbxassetid://140178620633381",
+        Loop = "rbxassetid://88430339285964",
+        End = "rbxassetid://131378430818911"
+    },
+    Purser_EnragedStart = "rbxassetid://126217710453897",
+    Purser_EnragedIdle = "rbxassetid://88434331204148",
+    Purser_EnragedWalk = "rbxassetid://95939236092784",
+    Purser_EnragedRun = "rbxassetid://95939236092784",
+    Purser_Execution = {
+        KillerRig = "rbxassetid://113859846249361",
+        PlayerRig = "rbxassetid://75990660285379"
+    },
+    Purser_Slash = "rbxassetid://109667959938617",
+    Purser_Behead = "rbxassetid://126681776859538",
+    Purser_GashingWoundStart = "rbxassetid://129976080405072",
+    Purser_GashingWound = {
+        KillerRig = "rbxassetid://81255669374177",
+        PlayerRig = "rbxassetid://83446441317389"
+    },
+        Hitbox_Victory = "rbxassetid://110764959093696",
         DeadRabbits_Idle = "rbxassetid://90058499489267",
         DeadRabbits_EnragedStart = "rbxassetid://80155033408286",
         DeadRabbits_Execution = {
@@ -367,24 +395,87 @@ local allKillerSkinAnimations = {
             KillerRig = "rbxassetid://106934658803618",
             PlayerRig = "rbxassetid://118506579780452",
         },
-        Hacklord_Hacklord_Idle = "rbxassetid://82241652784826",
-        Hacklord_Walk = "rbxassetid://119242164490314",
-        Hacklord_Run = "rbxassetid://92430101129682",
-        Hacklord_Execution = {
-            KillerRig = "rbxassetid://72388002765772",
-            PlayerRig = "rbxassetid://102726927317337",
-        },
-        Hacklord_Slash = "rbxassetid://92173139187970",
-        Hacklord_Entanglement = "rbxassetid://93491748129367",
-        Hacklord_UnstableEye = "rbxassetid://101469068804093",
-        Hacklord_RejuvenateTheRotten = "rbxassetid://119165364494366",
-        Hacklord_MassInfection = "rbxassetid://70447634862911",
+    Hacklord_Idle = "rbxassetid://82241652784826",
+    Hacklord_Walk = "rbxassetid://119242164490314",
+    Hacklord_Run = "rbxassetid://92430101129682",
+    Hacklord_Introduction = "rbxassetid://129034387543599",
+    Hacklord_xecution = {
+        KillerRig = "rbxassetid://72388002765772",
+        PlayerRig = "rbxassetid://102726927317337",
+        FinalRig = "rbxassetid://131568412147987"
+    },
+    Hacklord_Entanglement = "rbxassetid://93491748129367",
+    Hacklord_UnstableEye = "rbxassetid://101469068804093",
+    Hacklord_RejuvenateTheRotten = "rbxassetid://119165364494366",
+    Hacklord_MassInfection = "rbxassetid://70447634862911",
+    Diva_Introduction = "rbxassetid://75858980379510",
+    Diva_Victory = "rbxassetid://140683048498537",
+    Diva_VictoryPlayer = "rbxassetid://111495080862755",
     	},
 	},
+    ["C00lkidd"] = {
+        Animations = {
+    Mafioso_Idle = "rbxassetid://96029349600709",
+    Mafioso_Walk = "rbxassetid://122086286372651",
+    Mafioso_Run = "rbxassetid://73833636394121",
+    Mafioso_InjuredIdle = "rbxassetid://96029349600709",
+    Mafioso_InjuredWalk = "rbxassetid://122086286372651",
+    Mafioso_InjuredRun = "rbxassetid://73833636394121",
+    Mafioso_Introduction = "rbxassetid://99346560204559",
+    Mafioso_IntroductionCapo = "rbxassetid://116775086867332",
+    Mafioso_IntroductionSoldier = "rbxassetid://139701607052837",
+    Mafioso_IntroductionConsigliere = "rbxassetid://77329126644976",
+    Mafioso_IntroductionContractee = "rbxassetid://102401884704449",
+    Mafioso_Victory = "rbxassetid://96029349600709",
+    Mafioso_VictoryLoop = "rbxassetid://96029349600709",
+    Mafioso_Execution = {
+        KillerRig = "rbxassetid://117334224937914",
+        PlayerRig = "rbxassetid://94064874960644"
+    },
+    Mafioso_Stunned = {
+        Start = "rbxassetid://83576574140705",
+        Loop = "rbxassetid://90130286239945",
+        End = "rbxassetid://90659184218371"
+    },
+    Mafioso_WalkspeedOverrideStart = "rbxassetid://99135633258223",
+    Mafioso_WalkspeedOverrideLoop = "rbxassetid://97167027849946",
+    Mafioso_WalkspeedOverrideHit = "rbxassetid://95414473113522",
+    Mafioso_WalkspeedOverrideMiss = "rbxassetid://111502301532583",
+    Mafioso_Attack = "rbxassetid://70371667919898",
+    Mafioso_CorruptNature = "rbxassetid://124243639579224",
+    Mafioso_SummonPizzaDelivery = "rbxassetid://91958039275960",
+    Mafioso_PizzaDeliveryAnimations = {
+        Summoned = "rbxassetid://134813951700806",
+        Idle = "rbxassetid://107486646772897",
+        Walk = "rbxassetid://118279775840493",
+        Hit = "rbxassetid://115770184988369"
+            },
+    Milestone_Execution = {
+        KillerRig = "rbxassetid://111705502957527",
+        PlayerRig = "rbxassetid://72309557684808"
+        },
+    Milestone_Execution007n7 = {
+        KillerRig = "rbxassetid://118661550773576",
+        PlayerRig = "rbxassetid://109636725569874"
+            },
+        },
+    },
+     ["Noli"] = {
+            Animations = {
+    Devesto_Introduction = "rbxassetid://131397813028602"
+        },
+    },
 }
-
 -- ВСТРОЕННЫЕ ДАННЫЕ АНИМАЦИЙ ВЫЖИВШИХ
 local allSurvivorAnimations = {
+    ["GreenbeltGuest"] = {
+        Animations = {
+        Block = "rbxassetid://82605295530067",
+        Charge = "rbxassetid://73502073176819",
+        Punch = "rbxassetid://138040001965654",
+        ParryPunch = "rbxassetid://108807732150251",
+        },
+    },
     ["JuggernautGuest"] = {
         Animations = {
             Block = "rbxassetid://95802026624883",
