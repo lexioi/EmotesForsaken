@@ -1,5 +1,5 @@
 -- === НАСТРОЙКА КЛЮЧА ===
-local validKey = "ImScripter"
+local validKey = "Roblox_Cheater"
 local linkToCopy = "https://discord.gg/XMNNPBa8FV" -- замените на нужную ссылку
 
 -- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
