@@ -148,7 +148,7 @@ local allKillerAnimations = {
             },
         },
     },
-    ["Jason"] = {
+    ["Slasher"] = {
         Animations = {
             Idle = "rbxassetid://116050994905421",
             Walk = "rbxassetid://93622022596108",
@@ -208,8 +208,12 @@ local allKillerAnimations = {
 }
 
 local allKillerSkinAnimations = {
-["Jason"] = {
+["Slasher"] = {
     Animations = {
+            Milestone_Execution = {
+    KillerRig = "rbxassetid://97176944963316",
+    PlayerRig = "rbxassetid://101656269837601",
+			},
             Purser_Idle = "rbxassetid://94895464960972",
     Purser_Walk = "rbxassetid://100206079439305",
     Purser_Run = "rbxassetid://138660433982140",
@@ -375,9 +379,9 @@ local allKillerSkinAnimations = {
      ["Noli"] = {
             Animations = {
     Devesto_Introduction = "rbxassetid://131397813028602"
-        },
-    },
-}
+        	},
+    	},
+	}
 -- ВСТРОЕННЫЕ ДАННЫЕ АНИМАЦИЙ ВЫЖИВШИХ
 local allSurvivorAnimations = {
     ["GreenbeltGuest"] = {
