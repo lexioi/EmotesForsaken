@@ -678,9 +678,10 @@ local function startMovementAnimationOverride(killerAnims: table)
         if not isMoving then
             targetAnimId = activeKillerMovementAnims.Idle
         else
-            if humanoid.WalkSpeed >= 26 then
+            -- <<< ИЗМЕНЕНИЕ: Порог скорости бега изменен на 23 >>>
+            if humanoid.WalkSpeed >= 23 then
                 targetAnimId = activeKillerMovementAnims.Run
-            else -- Охватывает и ходьбу (1-12), и стандартную скорость (16)
+            else -- Охватывает и ходьбу, и стандартную скорость
                 targetAnimId = activeKillerMovementAnims.Walk
             end
         end
@@ -1084,6 +1085,34 @@ local function createCategoryButtons(categoryName: string, folder: Folder?)
 
                     currentCategoryData.subCategories[characterName].scrollingFrame = subCatFrame
                     currentCategoryData.subCategories[characterName].uiListLayout = subCatLayout
+
+                    -- <<< ИЗМЕНЕНИЕ: Добавляем кнопку Fake Death для категории Killer Animations >>>
+                    if categoryName == "Killer Animations" then
+                        local fakeDeathButton = Instance.new("TextButton")
+                        fakeDeathButton.Name = "FakeDeathButton"
+                        fakeDeathButton.Parent = subCatFrame
+                        fakeDeathButton.Size = UDim2.new(1, -10, 0, 40)
+                        fakeDeathButton.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+                        fakeDeathButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+                        fakeDeathButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        fakeDeathButton.Text = "Fake Death (Toggle)"
+                        fakeDeathButton.Font = Enum.Font.SourceSansBold
+                        fakeDeathButton.TextSize = 18
+                        fakeDeathButton.LayoutOrder = -1 -- Ставит кнопку в самый верх
+
+                        fakeDeathButton.MouseButton1Click:Connect(function()
+                            if humanoid then
+                                local currentState = humanoid:GetState()
+                                if currentState == Enum.HumanoidStateType.Ragdoll or currentState == Enum.HumanoidStateType.Physics then
+                                    humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                                else
+                                    stopMovementAnimationOverride()
+                                    stopAllEmotes()
+                                    humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
+                                end
+                            end
+                        end)
+                    end
 					
                     if characterData.ZombieAnimations then
                         createAnimationButtonsRecursive(subCatFrame, subCatLayout, characterData.ZombieAnimations, characterName, categoryName)
@@ -1319,8 +1348,9 @@ UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
         end
     elseif input.UserInputType == Enum.UserInputType.Gamepad1 and input.KeyCode == Enum.KeyCode.ButtonA then
         stopAllEmotes()
-    elseif input.UserInputType == Enum.UserInputType.Touch then
-        stopAllEmotes()
+    -- <<< ИЗМЕНЕНИЕ: Убрана строка, которая останавливала анимацию при любом нажатии на экран на мобильных устройствах >>>
+    -- elseif input.UserInputType == Enum.UserInputType.Touch then
+    --     stopAllEmotes()
     end
 end)
 
