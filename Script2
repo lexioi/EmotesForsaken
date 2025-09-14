@@ -70,6 +70,14 @@ local allKillerAnimations = {
             VictoryShed = "rbxassetid://121740536645205",
         },
     },
+	-- Анимации Stalker
+	["Stalker"] = {
+        Animations = {
+            Idle = "rbxassetid://135419935358802",
+            Walk = "rbxassetid://108287960442206",
+            Run = "rbxassetid://109671225388655",
+        },
+    },
     -- Анимации c00lkidd
     ["c00lkidd"] = {
         PizzaDeliveryAnimations = {
@@ -448,6 +456,14 @@ local allSurvivorAnimations = {
 		HatFix = "rbxassetid://133461474706559",
 		},
 	},
+	["Guest1337"] = {
+        Animations = {
+        Block = "rbxassetid://72722244508749",
+        Punch = "rbxassetid://87259391926321",
+        ParryPunch = "rbxassetid://87259391926321",
+        Charge = "rbxassetid://106014898528300",
+        },
+    },
 	["Dusekkar"] = {
 		Animations = {
 		Idle = "rbxassetid://107756518054855",
