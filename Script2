@@ -1,48 +1,1197 @@
--- Obfuscated by assistant
+-- === НАСТРОЙКА КЛЮЧА ===
+local validKey = "DOdScrIpt"
+local linkToCopy = "https://discord.gg/aGk2GdYyRg" -- замените на нужную ссылку
 
-local function __b64_decode(data)
-    local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^'..b..'=]', '')
-    return (data:gsub('.', function(x)
-        if x == '=' then return '' end
-        local r,f='',(b:find(x)-1)
-        for i=6,1,-1 do r = r .. (f%2^i - f%2^(i-1) > 0 and '1' or '0') end
-        return r
-    end):gsub('%d%d%d?%d?%d?%d?%d?%d', function(x)
-        if #x ~= 8 then return '' end
-        local c = 0
-        for i=1,8 do c = c*2 + (x:sub(i,i) == '1' and 1 or 0) end
-        return string.char(c)
-    end))
+-- === СОЗДАНИЕ GUI ДЛЯ КЛЮЧА ===
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local keyGui = Instance.new("ScreenGui")
+keyGui.Name = "KeySystemGui"
+keyGui.ResetOnSpawn = false
+keyGui.Parent = playerGui
+
+local keyFrame = Instance.new("Frame")
+keyFrame.Size = UDim2.new(0, 300, 0, 200)
+keyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+keyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+keyFrame.BackgroundTransparency = 0.5 -- прозрачность 0.4-0.6
+keyFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+keyFrame.Parent = keyGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Key System"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 24
+title.Parent = keyFrame
+
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.8, 0, 0, 40)
+textBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+textBox.PlaceholderText = "Enter your key..."
+textBox.Text = ""
+textBox.TextScaled = true
+textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+textBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+textBox.Parent = keyFrame
+
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0.45, -5, 0, 40)
+copyButton.Position = UDim2.new(0.05, 0, 0.65, 0)
+copyButton.Text = "Copy Link"
+copyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+copyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.Font = Enum.Font.SourceSansBold
+copyButton.TextSize = 18
+copyButton.Parent = keyFrame
+
+local submitButton = Instance.new("TextButton")
+submitButton.Size = UDim2.new(0.45, -5, 0, 40)
+submitButton.Position = UDim2.new(0.5, 5, 0.65, 0)
+submitButton.Text = "Submit Key"
+submitButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitButton.Font = Enum.Font.SourceSansBold
+submitButton.TextSize = 18
+submitButton.Parent = keyFrame
+
+-- Текст "Скопировано!" под кнопкой Copy Link (изначально скрыт)
+local copiedLabel = Instance.new("TextLabel")
+copiedLabel.Size = UDim2.new(0.45, -5, 0, 20)
+copiedLabel.Position = UDim2.new(0.05, 0, 0.75, 0)
+copiedLabel.BackgroundTransparency = 1
+copiedLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+copiedLabel.Font = Enum.Font.SourceSansBold
+copiedLabel.TextSize = 16
+copiedLabel.Text = ""
+copiedLabel.TextTransparency = 1 -- изначально скрыт
+copiedLabel.Parent = keyFrame
+
+-- === ФУНКЦИЯ КОПИРОВАНИЯ ССЫЛКИ ===
+copyButton.Activated:Connect(function()
+	setclipboard(linkToCopy)
+	
+	-- Показываем "Скопировано!" на 2 секунды
+	copiedLabel.Text = "Copied!"
+	copiedLabel.TextTransparency = 0
+	wait(2)
+	copiedLabel.TextTransparency = 1
+end)
+
+-- === ВСТАВЬ СЮДА КОД scriptl.txt ===
+local lexioiScript = [[
+-- Получаем необходимые сервисы
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- Переменные игрока и персонажа
+local player = Players.LocalPlayer
+local character: Model? = player.Character
+local humanoid: Humanoid?
+local originalJumpPower = 50
+
+-- <<< НАЧАЛО: НОВЫЕ ПУТИ ДЛЯ ДИНАМИЧЕСКОГО ПОИСКА >>>
+local charactersFolder = ReplicatedStorage:WaitForChild("Characters")
+local killerCharactersFolder = charactersFolder and charactersFolder:FindFirstChild("Killer")
+local survivorCharactersFolder = charactersFolder and charactersFolder:FindFirstChild("Survivor")
+-- <<< КОНЕЦ: НОВЫЕ ПУТИ ДЛЯ ДИНАМИЧЕСКОГО ПОИСКА >>>
+
+
+-- <<< ПЕРЕМЕННЫЕ ДЛЯ УПРАВЛЕНИЯ АНИМАЦИЯМИ ДВИЖЕНИЯ >>>
+local movementAnimConnection: RBXScriptConnection? = nil
+local activeMovementAnims: {Idle: string?, Walk: string?, Sprint: string?}? = nil -- ИЗМЕНЕНИЕ 1: Run -> Sprint
+local currentMovementAnimTrack: AnimationTrack? = nil
+local isAutoAnimsEnabled = true
+-- <<< НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ АВТО-АНИМАЦИЙ ВЫЖИВШИХ >>>
+local isSurvivorAutoAnimsEnabled = false
+local isSurvivorHurtAnimsEnabled = false
+
+
+--[[
+	 <<< УДАЛЕНО >>>
+	 Большие статичные таблицы allKillerAnimations, allKillerSkinAnimations и allSurvivorAnimations
+	 были полностью удалены. Данные теперь загружаются динамически.
+]]
+
+-- Структура для хранения данных категорий (остается для управления GUI)
+local categoryData = {
+    ["Killer Animations"] = {
+        dataSource = {}, -- Будет заполнено динамически
+        subCategories = {},
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {},
+        currentSubCategoryFrame = nil,
+        currentSubCategoryLayout = nil,
+    },
+    ["Killer-Skins Anim"] = {
+        dataSource = {}, -- Будет заполнено динамически
+        subCategories = {},
+        skinSubCategories = {},
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {},
+        currentSubCategoryFrame = nil,
+        currentSubCategoryLayout = nil,
+        currentSkinFrame = nil,
+        currentSkinLayout = nil,
+    },
+    ["Survivors Animations"] = {
+        dataSource = {}, -- Будет заполнено динамически
+        subCategories = {},
+        buttons = {},
+        scrollingFrame = nil,
+        uiListLayout = nil,
+        buttonNameCache = {},
+        currentSubCategoryFrame = nil,
+        currentSubCategoryLayout = nil,
+    },
+}
+
+-- GUI Creation (без изменений)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "EmoteGui"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenButton"
+openButton.Parent = screenGui
+openButton.Size = UDim2.new(0, 150, 0, 50)
+openButton.Position = UDim2.new(0.5, -75, 0.8, 0)
+openButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+openButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+openButton.Text = "Open Menu"
+openButton.Font = Enum.Font.SourceSansBold
+openButton.TextSize = 20
+openButton.Active = true
+openButton.Draggable = true
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "EmoteMenu"
+mainFrame.Parent = screenGui
+mainFrame.Size = UDim2.new(0, 500, 0, 450)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -225)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.BackgroundTransparency = 0.6
+mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Visible = false
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.ClipsDescendants = true
+
+local categoryButtonsFrame = Instance.new("Frame")
+categoryButtonsFrame.Name = "CategoryButtons"
+categoryButtonsFrame.Parent = mainFrame
+categoryButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
+categoryButtonsFrame.Position = UDim2.new(0, 0, 0, 0)
+categoryButtonsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+categoryButtonsFrame.BorderSizePixel = 0
+
+local uiListLayoutCategories = Instance.new("UIListLayout")
+uiListLayoutCategories.Parent = categoryButtonsFrame
+uiListLayoutCategories.FillDirection = Enum.FillDirection.Horizontal
+uiListLayoutCategories.HorizontalAlignment = Enum.HorizontalAlignment.Center
+uiListLayoutCategories.VerticalAlignment = Enum.VerticalAlignment.Center
+uiListLayoutCategories.Padding = UDim.new(0, 5)
+uiListLayoutCategories.SortOrder = Enum.SortOrder.LayoutOrder
+
+local searchButton = Instance.new("TextButton")
+searchButton.Name = "SearchButton"
+searchButton.Parent = mainFrame
+searchButton.Size = UDim2.new(0, 30, 0, 30)
+searchButton.Position = UDim2.new(1, -35, 0, 45)
+searchButton.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+searchButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+searchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchButton.Text = "🔍"
+searchButton.Font = Enum.Font.SourceSansBold
+searchButton.TextSize = 20
+searchButton.ZIndex = 2
+
+local searchTextBox = Instance.new("TextBox")
+searchTextBox.Name = "SearchTextBox"
+searchTextBox.Parent = mainFrame
+searchTextBox.Size = UDim2.new(1, -40, 0, 30)
+searchTextBox.Position = UDim2.new(0, 5, 0, 85)
+searchTextBox.PlaceholderText = "Search in the current category..."
+searchTextBox.TextScaled = true
+searchTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+searchTextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+searchTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchTextBox.Visible = false
+searchTextBox.ClearTextOnFocus = false
+searchTextBox.ZIndex = 2
+
+local resizeButton = Instance.new("TextButton")
+resizeButton.Name = "ResizeButton"
+resizeButton.Parent = mainFrame
+resizeButton.Size = UDim2.new(0, 20, 0, 20)
+resizeButton.Position = UDim2.new(1, -20, 1, -20)
+resizeButton.AnchorPoint = Vector2.new(1, 1)
+resizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+resizeButton.BackgroundTransparency = 0.7
+resizeButton.BorderSizePixel = 0
+resizeButton.Text = ""
+resizeButton.ZIndex = 10
+
+-- Логика изменения размера (без изменений)
+local isResizing = false
+local resizeConnection: RBXScriptConnection?
+resizeButton.MouseButton1Down:Connect(function()
+    isResizing = true
+    local startMousePos = UserInputService:GetMouseLocation()
+    local startFrameSize = mainFrame.AbsoluteSize
+
+    if resizeConnection then resizeConnection:Disconnect() end
+
+    resizeConnection = UserInputService.InputChanged:Connect(function(input)
+        if not isResizing then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            local currentMousePos = UserInputService:GetMouseLocation()
+            local delta = currentMousePos - startMousePos
+            local newSize = startFrameSize + delta
+            local minWidth = 300
+            local minHeight = 250
+            mainFrame.Size = UDim2.new(0, math.max(newSize.X, minWidth), 0, math.max(newSize.Y, minHeight))
+        end
+    end)
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if isResizing then
+            isResizing = false
+            if resizeConnection then
+                resizeConnection:Disconnect()
+                resizeConnection = nil
+            end
+        end
+    end
+end)
+
+
+--- Основные функции ---
+
+local function stopMovementAnimationOverride()
+    if movementAnimConnection then
+        movementAnimConnection:Disconnect()
+        movementAnimConnection = nil
+    end
+    if currentMovementAnimTrack then
+        currentMovementAnimTrack:Stop()
+        currentMovementAnimTrack:Destroy()
+        currentMovementAnimTrack = nil
+    end
+    activeMovementAnims = nil
 end
 
-local __strs = {}
-local function __s(i)
-    return __b64_decode(__strs[i])
+local function startMovementAnimationOverride(animSet: table)
+    stopMovementAnimationOverride()
+
+    -- ИЗМЕНЕНИЕ 1: Проверка на Sprint вместо Run
+    if not animSet or not animSet.Idle or not animSet.Walk or not animSet.Sprint then
+        warn("DEBUG: У выбранного набора нет необходимых анимаций Idle, Walk и Sprint.")
+        return
+    end
+
+	-- Проверка для киллеров
+    if currentCategory == "Killer Animations" or currentCategory == "Killer-Skins Anim" then
+		if not isAutoAnimsEnabled then return end
+	-- Проверка для выживших
+	elseif currentCategory == "Survivors Animations" then
+		if not isSurvivorAutoAnimsEnabled and not isSurvivorHurtAnimsEnabled then return end
+	end
+
+    activeMovementAnims = {}
+	if currentCategory == "Survivors Animations" and isSurvivorHurtAnimsEnabled then
+		-- Для выживших используем Hurt-анимации, если они включены и существуют
+		activeMovementAnims.Idle = animSet.HurtIdle or animSet.Idle
+		activeMovementAnims.Walk = animSet.HurtWalk or animSet.Walk
+		-- ИЗМЕНЕНИЕ 1: HurtRun -> HurtSprint (на всякий случай) и Run -> Sprint
+		activeMovementAnims.Sprint = animSet.HurtSprint or animSet.Sprint
+	else
+		-- Стандартное поведение для киллеров и обычных анимаций выживших
+		activeMovementAnims.Idle = animSet.Idle
+		activeMovementAnims.Walk = animSet.Walk
+		-- ИЗМЕНЕНИЕ 1: Run -> Sprint
+		activeMovementAnims.Sprint = animSet.Sprint
+	end
+
+    movementAnimConnection = RunService.RenderStepped:Connect(function()
+        if not humanoid or not activeMovementAnims or not mainFrame.Visible then
+            stopMovementAnimationOverride()
+            return
+        end
+
+        local isMoving = humanoid.MoveDirection.Magnitude > 0
+        local targetAnimId: string? = nil
+
+        if not isMoving then
+            targetAnimId = activeMovementAnims.Idle
+        else
+            if humanoid.WalkSpeed >= 23 then -- Порог скорости для спринта
+                targetAnimId = activeMovementAnims.Sprint
+            else
+                targetAnimId = activeMovementAnims.Walk
+            end
+        end
+
+        if targetAnimId then
+            if currentMovementAnimTrack and currentMovementAnimTrack.Animation and currentMovementAnimTrack.Animation.AnimationId == targetAnimId then
+                return
+            end
+
+            if currentMovementAnimTrack then
+                currentMovementAnimTrack:Stop()
+				currentMovementAnimTrack:Destroy()
+            end
+
+            local animation = Instance.new("Animation")
+            animation.AnimationId = targetAnimId
+            currentMovementAnimTrack = humanoid:LoadAnimation(animation)
+            currentMovementAnimTrack:Play()
+        end
+    end)
 end
 
-do
-__strs[1] = "RE9kU2NySXB0"
-__strs[2] = "aHR0cHM6Ly9kaXNjb3JkLmdnL2FHazJHZFl5Umc="
-__strs[3] = "UGxheWVycw=="
-__strs[4] = "UGxheWVyR3Vp"
-__strs[5] = "U2NyZWVuR3Vp"
-__strs[6] = "S2V5U3lzdGVtR3Vp"
-__strs[7] = "RnJhbWU="
-__strs[8] = "VGV4dExhYmVs"
-__strs[9] = "S2V5IFN5c3RlbQ=="
-__strs[10] = "VGV4dEJveA=="
-__strs[11] = "RW50ZXIgeW91ciBrZXkuLi4="
-__strs[12] = ""
-__strs[13] = "VGV4dEJ1dHRvbg=="
-__strs[14] = "Q29weSBMaW5r"
-__strs[15] = "VGV4dEJ1dHRvbg=="
-__strs[16] = "U3VibWl0IEtleQ=="
-__strs[17] = "VGV4dExhYmVs"
-__strs[18] = ""
-__strs[19] = "Q29waWVkIQ=="
-__strs[20] = "Cgpsb2NhbCBSZXBsaWNhdGVkU3RvcmFnZSA9IGdhbWU6R2V0U2VydmljZSgiUmVwbGljYXRlZFN0b3JhZ2UiKQpsb2NhbCBQbGF5ZXJzID0gZ2FtZTpHZXRTZXJ2aWNlKCJQbGF5ZXJzIikKbG9jYWwgVXNlcklucHV0U2VydmljZSA9IGdhbWU6R2V0U2VydmljZSgiVXNlcklucHV0U2VydmljZSIpCmxvY2FsIFJ1blNlcnZpY2UgPSBnYW1lOkdldFNlcnZpY2UoIlJ1blNlcnZpY2UiKQoKCmxvY2FsIHBsYXllciA9IFBsYXllcnMuTG9jYWxQbGF5ZXIKbG9jYWwgY2hhcmFjdGVyOiBNb2RlbD8gPSBwbGF5ZXIuQ2hhcmFjdGVyCmxvY2FsIGh1bWFub2lkOiBIdW1hbm9pZD8KbG9jYWwgb3JpZ2luYWxKdW1wUG93ZXIgPSA1MAoKCmxvY2FsIGNoYXJhY3RlcnNGb2xkZXIgPSBSZXBsaWNhdGVkU3RvcmFnZTpXYWl0Rm9yQ2hpbGQoIkNoYXJhY3RlcnMiKQpsb2NhbCBraWxsZXJDaGFyYWN0ZXJzRm9sZGVyID0gY2hhcmFjdGVyc0ZvbGRlciBhbmQgY2hhcmFjdGVyc0ZvbGRlcjpGaW5kRmlyc3RDaGlsZCgiS2lsbGVyIikKbG9jYWwgc3Vydml2b3JDaGFyYWN0ZXJzRm9sZGVyID0gY2hhcmFjdGVyc0ZvbGRlciBhbmQgY2hhcmFjdGVyc0ZvbGRlcjpGaW5kRmlyc3RDaGlsZCgiU3Vydml2b3IiKQoKCgoKbG9jYWwgbW92ZW1lbnRBbmltQ29ubmVjdGlvbjogUkJYU2NyaXB0Q29ubmVjdGlvbj8gPSBuaWwKbG9jYWwgYWN0aXZlTW92ZW1lbnRBbmltczoge0lkbGU6IHN0cmluZz8sIFdhbGs6IHN0cmluZz8sIFNwcmludDogc3RyaW5nP30/ID0gbmlsIApsb2NhbCBjdXJyZW50TW92ZW1lbnRBbmltVHJhY2s6IEFuaW1hdGlvblRyYWNrPyA9IG5pbApsb2NhbCBpc0F1dG9Bbmltc0VuYWJsZWQgPSB0cnVlCgpsb2NhbCBpc1N1cnZpdm9yQXV0b0FuaW1zRW5hYmxlZCA9IGZhbHNlCmxvY2FsIGlzU3Vydml2b3JIdXJ0QW5pbXNFbmFibGVkID0gZmFsc2UKCgoKCgpsb2NhbCBjYXRlZ29yeURhdGEgPSB7CiAgICBbIktpbGxlciBBbmltYXRpb25zIl0gPSB7CiAgICAgICAgZGF0YVNvdXJjZSA9IHt9LCAKICAgICAgICBzdWJDYXRlZ29yaWVzID0ge30sCiAgICAgICAgYnV0dG9ucyA9IHt9LAogICAgICAgIHNjcm9sbGluZ0ZyYW1lID0gbmlsLAogICAgICAgIHVpTGlzdExheW91dCA9IG5pbCwKICAgICAgICBidXR0b25OYW1lQ2FjaGUgPSB7fSwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IG5pbCwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlMYXlvdXQgPSBuaWwsCiAgICB9LAogICAgWyJLaWxsZXItU2tpbnMgQW5pbSJdID0gewogICAgICAgIGRhdGFTb3VyY2UgPSB7fSwgCiAgICAgICAgc3ViQ2F0ZWdvcmllcyA9IHt9LAogICAgICAgIHNraW5TdWJDYXRlZ29yaWVzID0ge30sCiAgICAgICAgYnV0dG9ucyA9IHt9LAogICAgICAgIHNjcm9sbGluZ0ZyYW1lID0gbmlsLAogICAgICAgIHVpTGlzdExheW91dCA9IG5pbCwKICAgICAgICBidXR0b25OYW1lQ2FjaGUgPSB7fSwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IG5pbCwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlMYXlvdXQgPSBuaWwsCiAgICAgICAgY3VycmVudFNraW5GcmFtZSA9IG5pbCwKICAgICAgICBjdXJyZW50U2tpbkxheW91dCA9IG5pbCwKICAgIH0sCiAgICBbIlN1cnZpdm9ycyBBbmltYXRpb25zIl0gPSB7CiAgICAgICAgZGF0YVNvdXJjZSA9IHt9LCAKICAgICAgICBzdWJDYXRlZ29yaWVzID0ge30sCiAgICAgICAgYnV0dG9ucyA9IHt9LAogICAgICAgIHNjcm9sbGluZ0ZyYW1lID0gbmlsLAogICAgICAgIHVpTGlzdExheW91dCA9IG5pbCwKICAgICAgICBidXR0b25OYW1lQ2FjaGUgPSB7fSwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IG5pbCwKICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnlMYXlvdXQgPSBuaWwsCiAgICB9LAp9CgoKbG9jYWwgc2NyZWVuR3VpID0gSW5zdGFuY2UubmV3KCJTY3JlZW5HdWkiKQpzY3JlZW5HdWkuTmFtZSA9ICJFbW90ZUd1aSIKc2NyZWVuR3VpLlBhcmVudCA9IHBsYXllcjpXYWl0Rm9yQ2hpbGQoIlBsYXllckd1aSIpCnNjcmVlbkd1aS5SZXNldE9uU3Bhd24gPSBmYWxzZQoKbG9jYWwgb3BlbkJ1dHRvbiA9IEluc3RhbmNlLm5ldygiVGV4dEJ1dHRvbiIpCm9wZW5CdXR0b24uTmFtZSA9ICJPcGVuQnV0dG9uIgpvcGVuQnV0dG9uLlBhcmVudCA9IHNjcmVlbkd1aQpvcGVuQnV0dG9uLlNpemUgPSBVRGltMi5uZXcoMCwgMTUwLCAwLCA1MCkKb3BlbkJ1dHRvbi5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLjUsIC03NSwgMC44LCAwKQpvcGVuQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig0NSwgNDUsIDQ1KQpvcGVuQnV0dG9uLkJvcmRlckNvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCm9wZW5CdXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCm9wZW5CdXR0b24uVGV4dCA9ICJPcGVuIE1lbnUiCm9wZW5CdXR0b24uRm9udCA9IEVudW0uRm9udC5Tb3VyY2VTYW5zQm9sZApvcGVuQnV0dG9uLlRleHRTaXplID0gMjAKb3BlbkJ1dHRvbi5BY3RpdmUgPSB0cnVlCm9wZW5CdXR0b24uRHJhZ2dhYmxlID0gdHJ1ZQoKbG9jYWwgbWFpbkZyYW1lID0gSW5zdGFuY2UubmV3KCJGcmFtZSIpCm1haW5GcmFtZS5OYW1lID0gIkVtb3RlTWVudSIKbWFpbkZyYW1lLlBhcmVudCA9IHNjcmVlbkd1aQptYWluRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygwLCA1MDAsIDAsIDQ1MCkKbWFpbkZyYW1lLlBvc2l0aW9uID0gVURpbTIubmV3KDAuNSwgLTI1MCwgMC41LCAtMjI1KQptYWluRnJhbWUuQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDM1LCAzNSwgMzUpCm1haW5GcmFtZS5CYWNrZ3JvdW5kVHJhbnNwYXJlbmN5ID0gMC42Cm1haW5GcmFtZS5Cb3JkZXJDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQptYWluRnJhbWUuVmlzaWJsZSA9IGZhbHNlCm1haW5GcmFtZS5BY3RpdmUgPSB0cnVlCm1haW5GcmFtZS5EcmFnZ2FibGUgPSB0cnVlCm1haW5GcmFtZS5DbGlwc0Rlc2NlbmRhbnRzID0gdHJ1ZQoKbG9jYWwgY2F0ZWdvcnlCdXR0b25zRnJhbWUgPSBJbnN0YW5jZS5uZXcoIkZyYW1lIikKY2F0ZWdvcnlCdXR0b25zRnJhbWUuTmFtZSA9ICJDYXRlZ29yeUJ1dHRvbnMiCmNhdGVnb3J5QnV0dG9uc0ZyYW1lLlBhcmVudCA9IG1haW5GcmFtZQpjYXRlZ29yeUJ1dHRvbnNGcmFtZS5TaXplID0gVURpbTIubmV3KDEsIDAsIDAsIDQwKQpjYXRlZ29yeUJ1dHRvbnNGcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCAwLCAwLCAwKQpjYXRlZ29yeUJ1dHRvbnNGcmFtZS5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjUsIDI1LCAyNSkKY2F0ZWdvcnlCdXR0b25zRnJhbWUuQm9yZGVyU2l6ZVBpeGVsID0gMAoKbG9jYWwgdWlMaXN0TGF5b3V0Q2F0ZWdvcmllcyA9IEluc3RhbmNlLm5ldygiVUlMaXN0TGF5b3V0IikKdWlMaXN0TGF5b3V0Q2F0ZWdvcmllcy5QYXJlbnQgPSBjYXRlZ29yeUJ1dHRvbnNGcmFtZQp1aUxpc3RMYXlvdXRDYXRlZ29yaWVzLkZpbGxEaXJlY3Rpb24gPSBFbnVtLkZpbGxEaXJlY3Rpb24uSG9yaXpvbnRhbAp1aUxpc3RMYXlvdXRDYXRlZ29yaWVzLkhvcml6b250YWxBbGlnbm1lbnQgPSBFbnVtLkhvcml6b250YWxBbGlnbm1lbnQuQ2VudGVyCnVpTGlzdExheW91dENhdGVnb3JpZXMuVmVydGljYWxBbGlnbm1lbnQgPSBFbnVtLlZlcnRpY2FsQWxpZ25tZW50LkNlbnRlcgp1aUxpc3RMYXlvdXRDYXRlZ29yaWVzLlBhZGRpbmcgPSBVRGltLm5ldygwLCA1KQp1aUxpc3RMYXlvdXRDYXRlZ29yaWVzLlNvcnRPcmRlciA9IEVudW0uU29ydE9yZGVyLkxheW91dE9yZGVyCgpsb2NhbCBzZWFyY2hCdXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iKQpzZWFyY2hCdXR0b24uTmFtZSA9ICJTZWFyY2hCdXR0b24iCnNlYXJjaEJ1dHRvbi5QYXJlbnQgPSBtYWluRnJhbWUKc2VhcmNoQnV0dG9uLlNpemUgPSBVRGltMi5uZXcoMCwgMzAsIDAsIDMwKQpzZWFyY2hCdXR0b24uUG9zaXRpb24gPSBVRGltMi5uZXcoMSwgLTM1LCAwLCA0NSkKc2VhcmNoQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig1NSwgNTUsIDU1KQpzZWFyY2hCdXR0b24uQm9yZGVyQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKc2VhcmNoQnV0dG9uLlRleHRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQpzZWFyY2hCdXR0b24uVGV4dCA9ICLwn5SNIgpzZWFyY2hCdXR0b24uRm9udCA9IEVudW0uRm9udC5Tb3VyY2VTYW5zQm9sZApzZWFyY2hCdXR0b24uVGV4dFNpemUgPSAyMApzZWFyY2hCdXR0b24uWkluZGV4ID0gMgoKbG9jYWwgc2VhcmNoVGV4dEJveCA9IEluc3RhbmNlLm5ldygiVGV4dEJveCIpCnNlYXJjaFRleHRCb3guTmFtZSA9ICJTZWFyY2hUZXh0Qm94IgpzZWFyY2hUZXh0Qm94LlBhcmVudCA9IG1haW5GcmFtZQpzZWFyY2hUZXh0Qm94LlNpemUgPSBVRGltMi5uZXcoMSwgLTQwLCAwLCAzMCkKc2VhcmNoVGV4dEJveC5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCA1LCAwLCA4NSkKc2VhcmNoVGV4dEJveC5QbGFjZWhvbGRlclRleHQgPSAiU2VhcmNoIGluIHRoZSBjdXJyZW50IGNhdGVnb3J5Li4uIgpzZWFyY2hUZXh0Qm94LlRleHRTY2FsZWQgPSB0cnVlCnNlYXJjaFRleHRCb3guQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDQwLCA0MCwgNDApCnNlYXJjaFRleHRCb3guQm9yZGVyQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKc2VhcmNoVGV4dEJveC5UZXh0Q29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKc2VhcmNoVGV4dEJveC5WaXNpYmxlID0gZmFsc2UKc2VhcmNoVGV4dEJveC5DbGVhclRleHRPbkZvY3VzID0gZmFsc2UKc2VhcmNoVGV4dEJveC5aSW5kZXggPSAyCgpsb2NhbCByZXNpemVCdXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iKQpyZXNpemVCdXR0b24uTmFtZSA9ICJSZXNpemVCdXR0b24iCnJlc2l6ZUJ1dHRvbi5QYXJlbnQgPSBtYWluRnJhbWUKcmVzaXplQnV0dG9uLlNpemUgPSBVRGltMi5uZXcoMCwgMjAsIDAsIDIwKQpyZXNpemVCdXR0b24uUG9zaXRpb24gPSBVRGltMi5uZXcoMSwgLTIwLCAxLCAtMjApCnJlc2l6ZUJ1dHRvbi5BbmNob3JQb2ludCA9IFZlY3RvcjIubmV3KDEsIDEpCnJlc2l6ZUJ1dHRvbi5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKcmVzaXplQnV0dG9uLkJhY2tncm91bmRUcmFuc3BhcmVuY3kgPSAwLjcKcmVzaXplQnV0dG9uLkJvcmRlclNpemVQaXhlbCA9IDAKcmVzaXplQnV0dG9uLlRleHQgPSAiIgpyZXNpemVCdXR0b24uWkluZGV4ID0gMTAKCgpsb2NhbCBpc1Jlc2l6aW5nID0gZmFsc2UKbG9jYWwgcmVzaXplQ29ubmVjdGlvbjogUkJYU2NyaXB0Q29ubmVjdGlvbj8KcmVzaXplQnV0dG9uLk1vdXNlQnV0dG9uMURvd246Q29ubmVjdChmdW5jdGlvbigpCiAgICBpc1Jlc2l6aW5nID0gdHJ1ZQogICAgbG9jYWwgc3RhcnRNb3VzZVBvcyA9IFVzZXJJbnB1dFNlcnZpY2U6R2V0TW91c2VMb2NhdGlvbigpCiAgICBsb2NhbCBzdGFydEZyYW1lU2l6ZSA9IG1haW5GcmFtZS5BYnNvbHV0ZVNpemUKCiAgICBpZiByZXNpemVDb25uZWN0aW9uIHRoZW4gcmVzaXplQ29ubmVjdGlvbjpEaXNjb25uZWN0KCkgZW5kCgogICAgcmVzaXplQ29ubmVjdGlvbiA9IFVzZXJJbnB1dFNlcnZpY2UuSW5wdXRDaGFuZ2VkOkNvbm5lY3QoZnVuY3Rpb24oaW5wdXQpCiAgICAgICAgaWYgbm90IGlzUmVzaXppbmcgdGhlbiByZXR1cm4gZW5kCiAgICAgICAgaWYgaW5wdXQuVXNlcklucHV0VHlwZSA9PSBFbnVtLlVzZXJJbnB1dFR5cGUuTW91c2VNb3ZlbWVudCB0aGVuCiAgICAgICAgICAgIGxvY2FsIGN1cnJlbnRNb3VzZVBvcyA9IFVzZXJJbnB1dFNlcnZpY2U6R2V0TW91c2VMb2NhdGlvbigpCiAgICAgICAgICAgIGxvY2FsIGRlbHRhID0gY3VycmVudE1vdXNlUG9zIC0gc3RhcnRNb3VzZVBvcwogICAgICAgICAgICBsb2NhbCBuZXdTaXplID0gc3RhcnRGcmFtZVNpemUgKyBkZWx0YQogICAgICAgICAgICBsb2NhbCBtaW5XaWR0aCA9IDMwMAogICAgICAgICAgICBsb2NhbCBtaW5IZWlnaHQgPSAyNTAKICAgICAgICAgICAgbWFpbkZyYW1lLlNpemUgPSBVRGltMi5uZXcoMCwgbWF0aC5tYXgobmV3U2l6ZS5YLCBtaW5XaWR0aCksIDAsIG1hdGgubWF4KG5ld1NpemUuWSwgbWluSGVpZ2h0KSkKICAgICAgICBlbmQKICAgIGVuZCkKZW5kKQoKVXNlcklucHV0U2VydmljZS5JbnB1dEVuZGVkOkNvbm5lY3QoZnVuY3Rpb24oaW5wdXQpCiAgICBpZiBpbnB1dC5Vc2VySW5wdXRUeXBlID09IEVudW0uVXNlcklucHV0VHlwZS5Nb3VzZUJ1dHRvbjEgdGhlbgogICAgICAgIGlmIGlzUmVzaXppbmcgdGhlbgogICAgICAgICAgICBpc1Jlc2l6aW5nID0gZmFsc2UKICAgICAgICAgICAgaWYgcmVzaXplQ29ubmVjdGlvbiB0aGVuCiAgICAgICAgICAgICAgICByZXNpemVDb25uZWN0aW9uOkRpc2Nvbm5lY3QoKQogICAgICAgICAgICAgICAgcmVzaXplQ29ubmVjdGlvbiA9IG5pbAogICAgICAgICAgICBlbmQKICAgICAgICBlbmQKICAgIGVuZAplbmQpCgoKCgpsb2NhbCBmdW5jdGlvbiBzdG9wTW92ZW1lbnRBbmltYXRpb25PdmVycmlkZSgpCiAgICBpZiBtb3ZlbWVudEFuaW1Db25uZWN0aW9uIHRoZW4KICAgICAgICBtb3ZlbWVudEFuaW1Db25uZWN0aW9uOkRpc2Nvbm5lY3QoKQogICAgICAgIG1vdmVtZW50QW5pbUNvbm5lY3Rpb24gPSBuaWwKICAgIGVuZAogICAgaWYgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrIHRoZW4KICAgICAgICBjdXJyZW50TW92ZW1lbnRBbmltVHJhY2s6U3RvcCgpCiAgICAgICAgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrOkRlc3Ryb3koKQogICAgICAgIGN1cnJlbnRNb3ZlbWVudEFuaW1UcmFjayA9IG5pbAogICAgZW5kCiAgICBhY3RpdmVNb3ZlbWVudEFuaW1zID0gbmlsCmVuZAoKbG9jYWwgZnVuY3Rpb24gc3RhcnRNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKGFuaW1TZXQ6IHRhYmxlKQogICAgc3RvcE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoKQoKICAgIAogICAgaWYgbm90IGFuaW1TZXQgb3Igbm90IGFuaW1TZXQuSWRsZSBvciBub3QgYW5pbVNldC5XYWxrIG9yIG5vdCBhbmltU2V0LlNwcmludCB0aGVuCiAgICAgICAgd2FybigiREVCVUc6INCjINCy0YvQsdGA0LDQvdC90L7Qs9C+INC90LDQsdC+0YDQsCDQvdC10YIg0L3QtdC+0LHRhdC+0LTQuNC80YvRhSDQsNC90LjQvNCw0YbQuNC5IElkbGUsIFdhbGsg0LggU3ByaW50LiIpCiAgICAgICAgcmV0dXJuCiAgICBlbmQKCgkKICAgIGlmIGN1cnJlbnRDYXRlZ29yeSA9PSAiS2lsbGVyIEFuaW1hdGlvbnMiIG9yIGN1cnJlbnRDYXRlZ29yeSA9PSAiS2lsbGVyLVNraW5zIEFuaW0iIHRoZW4KCQlpZiBub3QgaXNBdXRvQW5pbXNFbmFibGVkIHRoZW4gcmV0dXJuIGVuZAoJCgllbHNlaWYgY3VycmVudENhdGVnb3J5ID09ICJTdXJ2aXZvcnMgQW5pbWF0aW9ucyIgdGhlbgoJCWlmIG5vdCBpc1N1cnZpdm9yQXV0b0FuaW1zRW5hYmxlZCBhbmQgbm90IGlzU3Vydml2b3JIdXJ0QW5pbXNFbmFibGVkIHRoZW4gcmV0dXJuIGVuZAoJZW5kCgogICAgYWN0aXZlTW92ZW1lbnRBbmltcyA9IHt9CglpZiBjdXJyZW50Q2F0ZWdvcnkgPT0gIlN1cnZpdm9ycyBBbmltYXRpb25zIiBhbmQgaXNTdXJ2aXZvckh1cnRBbmltc0VuYWJsZWQgdGhlbgoJCQoJCWFjdGl2ZU1vdmVtZW50QW5pbXMuSWRsZSA9IGFuaW1TZXQuSHVydElkbGUgb3IgYW5pbVNldC5JZGxlCgkJYWN0aXZlTW92ZW1lbnRBbmltcy5XYWxrID0gYW5pbVNldC5IdXJ0V2FsayBvciBhbmltU2V0LldhbGsKCQkKCQlhY3RpdmVNb3ZlbWVudEFuaW1zLlNwcmludCA9IGFuaW1TZXQuSHVydFNwcmludCBvciBhbmltU2V0LlNwcmludAoJZWxzZQoJCQoJCWFjdGl2ZU1vdmVtZW50QW5pbXMuSWRsZSA9IGFuaW1TZXQuSWRsZQoJCWFjdGl2ZU1vdmVtZW50QW5pbXMuV2FsayA9IGFuaW1TZXQuV2FsawoJCQoJCWFjdGl2ZU1vdmVtZW50QW5pbXMuU3ByaW50ID0gYW5pbVNldC5TcHJpbnQKCWVuZAoKICAgIG1vdmVtZW50QW5pbUNvbm5lY3Rpb24gPSBSdW5TZXJ2aWNlLlJlbmRlclN0ZXBwZWQ6Q29ubmVjdChmdW5jdGlvbigpCiAgICAgICAgaWYgbm90IGh1bWFub2lkIG9yIG5vdCBhY3RpdmVNb3ZlbWVudEFuaW1zIG9yIG5vdCBtYWluRnJhbWUuVmlzaWJsZSB0aGVuCiAgICAgICAgICAgIHN0b3BNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKCkKICAgICAgICAgICAgcmV0dXJuCiAgICAgICAgZW5kCgogICAgICAgIGxvY2FsIGlzTW92aW5nID0gaHVtYW5vaWQuTW92ZURpcmVjdGlvbi5NYWduaXR1ZGUgPiAwCiAgICAgICAgbG9jYWwgdGFyZ2V0QW5pbUlkOiBzdHJpbmc/ID0gbmlsCgogICAgICAgIGlmIG5vdCBpc01vdmluZyB0aGVuCiAgICAgICAgICAgIHRhcmdldEFuaW1JZCA9IGFjdGl2ZU1vdmVtZW50QW5pbXMuSWRsZQogICAgICAgIGVsc2UKICAgICAgICAgICAgaWYgaHVtYW5vaWQuV2Fsa1NwZWVkID49IDIzIHRoZW4gCiAgICAgICAgICAgICAgICB0YXJnZXRBbmltSWQgPSBhY3RpdmVNb3ZlbWVudEFuaW1zLlNwcmludAogICAgICAgICAgICBlbHNlCiAgICAgICAgICAgICAgICB0YXJnZXRBbmltSWQgPSBhY3RpdmVNb3ZlbWVudEFuaW1zLldhbGsKICAgICAgICAgICAgZW5kCiAgICAgICAgZW5kCgogICAgICAgIGlmIHRhcmdldEFuaW1JZCB0aGVuCiAgICAgICAgICAgIGlmIGN1cnJlbnRNb3ZlbWVudEFuaW1UcmFjayBhbmQgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrLkFuaW1hdGlvbiBhbmQgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrLkFuaW1hdGlvbi5BbmltYXRpb25JZCA9PSB0YXJnZXRBbmltSWQgdGhlbgogICAgICAgICAgICAgICAgcmV0dXJuCiAgICAgICAgICAgIGVuZAoKICAgICAgICAgICAgaWYgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrIHRoZW4KICAgICAgICAgICAgICAgIGN1cnJlbnRNb3ZlbWVudEFuaW1UcmFjazpTdG9wKCkKCQkJCWN1cnJlbnRNb3ZlbWVudEFuaW1UcmFjazpEZXN0cm95KCkKICAgICAgICAgICAgZW5kCgogICAgICAgICAgICBsb2NhbCBhbmltYXRpb24gPSBJbnN0YW5jZS5uZXcoIkFuaW1hdGlvbiIpCiAgICAgICAgICAgIGFuaW1hdGlvbi5BbmltYXRpb25JZCA9IHRhcmdldEFuaW1JZAogICAgICAgICAgICBjdXJyZW50TW92ZW1lbnRBbmltVHJhY2sgPSBodW1hbm9pZDpMb2FkQW5pbWF0aW9uKGFuaW1hdGlvbikKICAgICAgICAgICAgY3VycmVudE1vdmVtZW50QW5pbVRyYWNrOlBsYXkoKQogICAgICAgIGVuZAogICAgZW5kKQplbmQKCgpsb2NhbCBhY3RpdmVFbW90ZXM6IHtbSHVtYW5vaWRdOiB7YW5pbWF0aW9uVHJhY2s6IEFuaW1hdGlvblRyYWNrfX0gPSB7fQoKbG9jYWwgZnVuY3Rpb24gc3RvcEVtb3RlRm9ySHVtYW5vaWQodGFyZ2V0SHVtYW5vaWQ6IEh1bWFub2lkKQoJbG9jYWwgZW1vdGVEYXRhID0gYWN0aXZlRW1vdGVzW3RhcmdldEh1bWFub2lkXQoJaWYgZW1vdGVEYXRhIGFuZCBlbW90ZURhdGEuYW5pbWF0aW9uVHJhY2sgdGhlbgoJCWVtb3RlRGF0YS5hbmltYXRpb25UcmFjazpTdG9wKCkKCQllbW90ZURhdGEuYW5pbWF0aW9uVHJhY2s6RGVzdHJveSgpCgllbmQKCWFjdGl2ZUVtb3Rlc1t0YXJnZXRIdW1hbm9pZF0gPSBuaWwKZW5kCgpsb2NhbCBmdW5jdGlvbiBzdG9wQWxsRW1vdGVzKCkKCWlmIGh1bWFub2lkIHRoZW4KCQlzdG9wRW1vdGVGb3JIdW1hbm9pZChodW1hbm9pZCkKCWVuZAoJYWN0aXZlRW1vdGVzID0ge30KZW5kCgpsb2NhbCBmdW5jdGlvbiBwbGF5TG9jYWxBbmltYXRpb24odGFyZ2V0SHVtYW5vaWQ6IEh1bWFub2lkLCBhbmltYXRpb25JZDogc3RyaW5nKQogICAgc3RvcEVtb3RlRm9ySHVtYW5vaWQodGFyZ2V0SHVtYW5vaWQpCgogICAgaWYgdHlwZShhbmltYXRpb25JZCkgfj0gInN0cmluZyIgb3Igbm90IHN0cmluZy5maW5kKGFuaW1hdGlvbklkLCAicmJ4YXNzZXRpZCIpIHRoZW4KCQl3YXJuKCJERUJVRzog0J3QtdC60L7RgNGA0LXQutGC0L3Ri9C5IGFuaW1hdGlvbklkOiIsIHRvc3RyaW5nKGFuaW1hdGlvbklkKSkKCQlyZXR1cm4KCWVuZAoKICAgIGxvY2FsIGFuaW1hdGlvbiA9IEluc3RhbmNlLm5ldygiQW5pbWF0aW9uIikKICAgIGFuaW1hdGlvbi5BbmltYXRpb25JZCA9IGFuaW1hdGlvbklkCiAgICBsb2NhbCBhbmltYXRpb25UcmFjayA9IHRhcmdldEh1bWFub2lkOkxvYWRBbmltYXRpb24oYW5pbWF0aW9uKQogICAgYW5pbWF0aW9uVHJhY2s6UGxheSgpCgogICAgYWN0aXZlRW1vdGVzW3RhcmdldEh1bWFub2lkXSA9IHthbmltYXRpb25UcmFjayA9IGFuaW1hdGlvblRyYWNrfQoKCWFuaW1hdGlvblRyYWNrLlN0b3BwZWQ6Q29ubmVjdChmdW5jdGlvbigpCgkJdGFzay53YWl0KCkKCQlpZiBhY3RpdmVFbW90ZXNbdGFyZ2V0SHVtYW5vaWRdIGFuZCBhY3RpdmVFbW90ZXNbdGFyZ2V0SHVtYW5vaWRdLmFuaW1hdGlvblRyYWNrID09IGFuaW1hdGlvblRyYWNrIHRoZW4KCQkJc3RvcEVtb3RlRm9ySHVtYW5vaWQodGFyZ2V0SHVtYW5vaWQpCgkJZW5kCgkJYW5pbWF0aW9uOkRlc3Ryb3koKQoJZW5kKQplbmQKCmxvY2FsIGZ1bmN0aW9uIHVwZGF0ZUNhbnZhc1NpemUodGFyZ2V0RnJhbWU6IFNjcm9sbGluZ0ZyYW1lLCB0YXJnZXRMYXlvdXQ6IFVJTGlzdExheW91dCkKICAgIGlmIG5vdCB0YXJnZXRGcmFtZSBvciBub3QgdGFyZ2V0TGF5b3V0IHRoZW4gcmV0dXJuIGVuZAogICAgdGFzay53YWl0KDAuMSkKICAgIGxvY2FsIGNvbnRlbnRTaXplID0gdGFyZ2V0TGF5b3V0LkFic29sdXRlQ29udGVudFNpemUKICAgIHRhcmdldEZyYW1lLkNhbnZhc1NpemUgPSBVRGltMi5uZXcoMCwgMCwgMCwgY29udGVudFNpemUuWSArIDEwKQplbmQKCgpsb2NhbCBmdW5jdGlvbiBmaWx0ZXJCdXR0b25zKHNlYXJjaFRleHQ6IHN0cmluZykKICAgIGxvY2FsIGxvd2VyU2VhcmNoVGV4dCA9IHNlYXJjaFRleHQ6bG93ZXIoKQogICAgbG9jYWwgdGFyZ2V0QnV0dG9ucyA9IG5pbAogICAgbG9jYWwgdGFyZ2V0U2Nyb2xsaW5nRnJhbWUgPSBuaWwKICAgIGxvY2FsIHRhcmdldFVJTGlzdExheW91dCA9IG5pbAoKCWxvY2FsIGFuaW1EYXRhID0gY2F0ZWdvcnlEYXRhW2N1cnJlbnRDYXRlZ29yeV0KCiAgICBpZiBjdXJyZW50Q2F0ZWdvcnkgPT0gIktpbGxlciBBbmltYXRpb25zIiBvciBjdXJyZW50Q2F0ZWdvcnkgPT0gIlN1cnZpdm9ycyBBbmltYXRpb25zIiB0aGVuCiAgICAgICAgaWYgY3VycmVudFN1YkNhdGVnb3J5IHRoZW4KICAgICAgICAgICAgdGFyZ2V0QnV0dG9ucyA9IGFuaW1EYXRhLnN1YkNhdGVnb3JpZXNbY3VycmVudFN1YkNhdGVnb3J5XS5idXR0b25zCiAgICAgICAgICAgIHRhcmdldFNjcm9sbGluZ0ZyYW1lID0gYW5pbURhdGEuY3VycmVudFN1YkNhdGVnb3J5RnJhbWUKICAgICAgICAgICAgdGFyZ2V0VUlMaXN0TGF5b3V0ID0gYW5pbURhdGEuY3VycmVudFN1YkNhdGVnb3J5TGF5b3V0CiAgICAgICAgZWxzZQogICAgICAgICAgICB0YXJnZXRCdXR0b25zID0gYW5pbURhdGEuYnV0dG9ucwogICAgICAgICAgICB0YXJnZXRTY3JvbGxpbmdGcmFtZSA9IGFuaW1EYXRhLnNjcm9sbGluZ0ZyYW1lCiAgICAgICAgICAgIHRhcmdldFVJTGlzdExheW91dCA9IGFuaW1EYXRhLnVpTGlzdExheW91dAogICAgICAgIGVuZAoJZWxzZWlmIGN1cnJlbnRDYXRlZ29yeSA9PSAiS2lsbGVyLVNraW5zIEFuaW0iIHRoZW4KCQlpZiBjdXJyZW50U2tpbk5hbWUgdGhlbgoJCQl0YXJnZXRCdXR0b25zID0gYW5pbURhdGEuc2tpblN1YkNhdGVnb3JpZXNbY3VycmVudFN1YkNhdGVnb3J5XVtjdXJyZW50U2tpbk5hbWVdLmJ1dHRvbnMKCQkJdGFyZ2V0U2Nyb2xsaW5nRnJhbWUgPSBhbmltRGF0YS5jdXJyZW50U2tpbkZyYW1lCgkJCXRhcmdldFVJTGlzdExheW91dCA9IGFuaW1EYXRhLmN1cnJlbnRTa2luTGF5b3V0CgkJZWxzZWlmIGN1cnJlbnRTdWJDYXRlZ29yeSB0aGVuCgkJCXRhcmdldEJ1dHRvbnMgPSBhbmltRGF0YS5zdWJDYXRlZ29yaWVzW2N1cnJlbnRTdWJDYXRlZ29yeV0uYnV0dG9ucwoJCQl0YXJnZXRTY3JvbGxpbmdGcmFtZSA9IGFuaW1EYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUZyYW1lCgkJCXRhcmdldFVJTGlzdExheW91dCA9IGFuaW1EYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUxheW91dAoJCWVsc2UKCQkJdGFyZ2V0QnV0dG9ucyA9IGFuaW1EYXRhLmJ1dHRvbnMKCQkJdGFyZ2V0U2Nyb2xsaW5nRnJhbWUgPSBhbmltRGF0YS5zY3JvbGxpbmdGcmFtZQoJCQl0YXJnZXRVSUxpc3RMYXlvdXQgPSBhbmltRGF0YS51aUxpc3RMYXlvdXQKCQllbmQKICAgIGVuZAoKICAgIGlmIG5vdCB0YXJnZXRCdXR0b25zIHRoZW4gcmV0dXJuIGVuZAoKICAgIGZvciBfLCBidXR0b24gaW4gcGFpcnModGFyZ2V0QnV0dG9ucykgZG8KICAgICAgICBsb2NhbCBidXR0b25UZXh0ID0gYnV0dG9uLlRleHQ6bG93ZXIoKQogICAgICAgIGlmIHN0cmluZy5maW5kKGJ1dHRvblRleHQsIGxvd2VyU2VhcmNoVGV4dCkgdGhlbgogICAgICAgICAgICBidXR0b24uVmlzaWJsZSA9IHRydWUKICAgICAgICBlbHNlCiAgICAgICAgICAgIGJ1dHRvbi5WaXNpYmxlID0gZmFsc2UKICAgICAgICBlbmQKICAgIGVuZAoKICAgIGlmIHRhcmdldFNjcm9sbGluZ0ZyYW1lIGFuZCB0YXJnZXRVSUxpc3RMYXlvdXQgdGhlbgogICAgICAgIHVwZGF0ZUNhbnZhc1NpemUodGFyZ2V0U2Nyb2xsaW5nRnJhbWUsIHRhcmdldFVJTGlzdExheW91dCkKICAgIGVuZAplbmQKCgpsb2NhbCBmdW5jdGlvbiBjcmVhdGVLaWxsZXJBdXRvQW5pbXNCdXR0b24ocGFyZW50RnJhbWU6IEd1aU9iamVjdCwgYW5pbVNldDogdGFibGUpCiAgICBsb2NhbCBhdXRvQW5pbXNCdXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iKQogICAgYXV0b0FuaW1zQnV0dG9uLk5hbWUgPSAiQXV0b0FuaW1zQnV0dG9uIgogICAgYXV0b0FuaW1zQnV0dG9uLlBhcmVudCA9IHBhcmVudEZyYW1lCiAgICBhdXRvQW5pbXNCdXR0b24uU2l6ZSA9IFVEaW0yLm5ldygxLCAtMTAsIDAsIDQwKQogICAgYXV0b0FuaW1zQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig0MCwgODAsIDEyMCkKICAgIGF1dG9Bbmltc0J1dHRvbi5Cb3JkZXJDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQogICAgYXV0b0FuaW1zQnV0dG9uLlRleHRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQogICAgYXV0b0FuaW1zQnV0dG9uLlRleHQgPSAiQXV0b0FuaW1zICgiIC4uIChpc0F1dG9Bbmltc0VuYWJsZWQgYW5kICJPbiIgb3IgIk9mZiIpIC4uICIpIgogICAgYXV0b0FuaW1zQnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKICAgIGF1dG9Bbmltc0J1dHRvbi5UZXh0U2l6ZSA9IDE4CiAgICBhdXRvQW5pbXNCdXR0b24uTGF5b3V0T3JkZXIgPSAtMTAwIAoKICAgIGF1dG9Bbmltc0J1dHRvbi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKICAgICAgICBpc0F1dG9Bbmltc0VuYWJsZWQgPSBub3QgaXNBdXRvQW5pbXNFbmFibGVkCiAgICAgICAgYXV0b0FuaW1zQnV0dG9uLlRleHQgPSAiQXV0b0FuaW1zICgiIC4uIChpc0F1dG9Bbmltc0VuYWJsZWQgYW5kICJPbiIgb3IgIk9mZiIpIC4uICIpIgogICAgICAgIGlmIGlzQXV0b0FuaW1zRW5hYmxlZCB0aGVuCiAgICAgICAgICAgIHN0YXJ0TW92ZW1lbnRBbmltYXRpb25PdmVycmlkZShhbmltU2V0KQogICAgICAgIGVsc2UKICAgICAgICAgICAgc3RvcE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoKQogICAgICAgIGVuZAogICAgZW5kKQoJcmV0dXJuIGF1dG9Bbmltc0J1dHRvbgplbmQKCgpsb2NhbCBmdW5jdGlvbiBjcmVhdGVTdXJ2aXZvckF1dG9Bbmltc0J1dHRvbnMocGFyZW50RnJhbWU6IEd1aU9iamVjdCwgYW5pbVNldDogdGFibGUpCglsb2NhbCBidXR0b25zQ29udGFpbmVyID0ge30KCQogICAgbG9jYWwgYXV0b0FuaW1zQnV0dG9uID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIikKICAgIGF1dG9Bbmltc0J1dHRvbi5OYW1lID0gIkF1dG9Bbmltc0J1dHRvbiIKICAgIGF1dG9Bbmltc0J1dHRvbi5QYXJlbnQgPSBwYXJlbnRGcmFtZQogICAgYXV0b0FuaW1zQnV0dG9uLlNpemUgPSBVRGltMi5uZXcoMC41LCAtNywgMCwgNDApIAogICAgYXV0b0FuaW1zQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig0MCwgODAsIDEyMCkKICAgIGF1dG9Bbmltc0J1dHRvbi5Cb3JkZXJDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQogICAgYXV0b0FuaW1zQnV0dG9uLlRleHRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQogICAgYXV0b0FuaW1zQnV0dG9uLlRleHQgPSAiQXV0b0FuaW1zIChPZmYpIgogICAgYXV0b0FuaW1zQnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKICAgIGF1dG9Bbmltc0J1dHRvbi5UZXh0U2l6ZSA9IDE2CiAgICBhdXRvQW5pbXNCdXR0b24uTGF5b3V0T3JkZXIgPSAtMTAwCgoJbG9jYWwgYXV0b0h1cnRBbmltc0J1dHRvbiA9IEluc3RhbmNlLm5ldygiVGV4dEJ1dHRvbiIpCiAgICBhdXRvSHVydEFuaW1zQnV0dG9uLk5hbWUgPSAiQXV0b0h1cnRBbmltc0J1dHRvbiIKICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uUGFyZW50ID0gcGFyZW50RnJhbWUKICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uU2l6ZSA9IFVEaW0yLm5ldygwLjUsIC04LCAwLCA0MCkgCglhdXRvSHVydEFuaW1zQnV0dG9uLlBvc2l0aW9uID0gVURpbTIubmV3KDAuNSwgLTIsIDAsIDApCiAgICBhdXRvSHVydEFuaW1zQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigxMjAsIDQwLCA0MCkKICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uQm9yZGVyQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCiAgICBhdXRvSHVydEFuaW1zQnV0dG9uLlRleHQgPSAiQXV0b0h1cnRBbmltcyAoT2ZmKSIKICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uRm9udCA9IEVudW0uRm9udC5Tb3VyY2VTYW5zQm9sZAogICAgYXV0b0h1cnRBbmltc0J1dHRvbi5UZXh0U2l6ZSA9IDE2CiAgICBhdXRvSHVydEFuaW1zQnV0dG9uLkxheW91dE9yZGVyID0gLTk5CgogICAgYXV0b0FuaW1zQnV0dG9uLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZnVuY3Rpb24oKQogICAgICAgIGlzU3Vydml2b3JBdXRvQW5pbXNFbmFibGVkID0gbm90IGlzU3Vydml2b3JBdXRvQW5pbXNFbmFibGVkCgkJaWYgaXNTdXJ2aXZvckF1dG9Bbmltc0VuYWJsZWQgdGhlbgoJCQlpc1N1cnZpdm9ySHVydEFuaW1zRW5hYmxlZCA9IGZhbHNlIAoJCWVuZAoJCQogICAgICAgIGF1dG9Bbmltc0J1dHRvbi5UZXh0ID0gIkF1dG9BbmltcyAoIiAuLiAoaXNTdXJ2aXZvckF1dG9Bbmltc0VuYWJsZWQgYW5kICJPbiIgb3IgIk9mZiIpIC4uICIpIgoJCWF1dG9IdXJ0QW5pbXNCdXR0b24uVGV4dCA9ICJBdXRvSHVydEFuaW1zIChPZmYpIgoKICAgICAgICBpZiBpc1N1cnZpdm9yQXV0b0FuaW1zRW5hYmxlZCB0aGVuCiAgICAgICAgICAgIHN0YXJ0TW92ZW1lbnRBbmltYXRpb25PdmVycmlkZShhbmltU2V0KQogICAgICAgIGVsc2UKICAgICAgICAgICAgc3RvcE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoKQogICAgICAgIGVuZAogICAgZW5kKQoJCglhdXRvSHVydEFuaW1zQnV0dG9uLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZnVuY3Rpb24oKQogICAgICAgIGlzU3Vydml2b3JIdXJ0QW5pbXNFbmFibGVkID0gbm90IGlzU3Vydml2b3JIdXJ0QW5pbXNFbmFibGVkCgkJaWYgaXNTdXJ2aXZvckh1cnRBbmltc0VuYWJsZWQgdGhlbgoJCQlpc1N1cnZpdm9yQXV0b0FuaW1zRW5hYmxlZCA9IGZhbHNlIAoJCWVuZAoJCQogICAgICAgIGF1dG9IdXJ0QW5pbXNCdXR0b24uVGV4dCA9ICJBdXRvSHVydEFuaW1zICgiIC4uIChpc1N1cnZpdm9ySHVydEFuaW1zRW5hYmxlZCBhbmQgIk9uIiBvciAiT2ZmIikgLi4gIikiCgkJYXV0b0FuaW1zQnV0dG9uLlRleHQgPSAiQXV0b0FuaW1zIChPZmYpIgoJCQogICAgICAgIGlmIGlzU3Vydml2b3JIdXJ0QW5pbXNFbmFibGVkIHRoZW4KICAgICAgICAgICAgc3RhcnRNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKGFuaW1TZXQpCiAgICAgICAgZWxzZQogICAgICAgICAgICBzdG9wTW92ZW1lbnRBbmltYXRpb25PdmVycmlkZSgpCiAgICAgICAgZW5kCiAgICBlbmQpCgoJdGFibGUuaW5zZXJ0KGJ1dHRvbnNDb250YWluZXIsIGF1dG9Bbmltc0J1dHRvbikKCXRhYmxlLmluc2VydChidXR0b25zQ29udGFpbmVyLCBhdXRvSHVydEFuaW1zQnV0dG9uKQoJcmV0dXJuIGJ1dHRvbnNDb250YWluZXIKZW5kCgoKCmxvY2FsIGZ1bmN0aW9uIGNyZWF0ZUFuaW1hdGlvbkJ1dHRvbnMocGFyZW50RnJhbWUsIGFuaW1hdGlvblRhYmxlLCBidXR0b25MaXN0VGFibGUpCiAgICBmb3IgYW5pbU5hbWUsIGFuaW1JZCBpbiBwYWlycyhhbmltYXRpb25UYWJsZSkgZG8KICAgICAgICBsb2NhbCBzaG91bGRTa2lwID0gZmFsc2UKICAgICAgICAKICAgICAgICBpZiBhbmltTmFtZSA9PSAiSWRsZSIgb3IgYW5pbU5hbWUgPT0gIldhbGsiIG9yIGFuaW1OYW1lID09ICJTcHJpbnQiIG9yCiAgICAgICAgICAgYW5pbU5hbWUgPT0gIkh1cnRJZGxlIiBvciBhbmltTmFtZSA9PSAiSHVydFdhbGsiIG9yIGFuaW1OYW1lID09ICJIdXJ0U3ByaW50IiB0aGVuCiAgICAgICAgICAgIHNob3VsZFNraXAgPSB0cnVlCiAgICAgICAgZW5kCgkJCiAgICAgICAgaWYgbm90IHNob3VsZFNraXAgdGhlbgoJCQlsb2NhbCBidXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iKQoJCQlidXR0b24uTmFtZSA9IGFuaW1OYW1lIC4uICJCdXR0b24iCgkJCWJ1dHRvbi5QYXJlbnQgPSBwYXJlbnRGcmFtZQoJCQlidXR0b24uU2l6ZSA9IFVEaW0yLm5ldygxLCAtMTAsIDAsIDQwKQoJCQlidXR0b24uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDYwLCA2MCwgNjApCgkJCWJ1dHRvbi5Cb3JkZXJDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQoJCQlidXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCgkJCWJ1dHRvbi5UZXh0ID0gYW5pbU5hbWUKCQkJYnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKCQkJYnV0dG9uLlRleHRTaXplID0gMTgKCgkJCWJ1dHRvbi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKCQkJCWlmIGh1bWFub2lkIGFuZCBjaGFyYWN0ZXIgdGhlbgoJCQkJCXBsYXlMb2NhbEFuaW1hdGlvbihodW1hbm9pZCwgYW5pbUlkKQoJCQkJZWxzZQoJCQkJCXdhcm4oIkRFQlVHOiDQndC10LLQvtC30LzQvtC20L3QviDQstC+0YHQv9GA0L7QuNC30LLQtdGB0YLQuCDQsNC90LjQvNCw0YbQuNGOLCDQs9GD0LzQsNC90L7QuNC0INC40LvQuCDQv9C10YDRgdC+0L3QsNC2INGA0LDQstC10L0gbmlsLiIpCgkJCQllbmQKCQkJZW5kKQoJCQl0YWJsZS5pbnNlcnQoYnV0dG9uTGlzdFRhYmxlLCBidXR0b24pCgkJZW5kCiAgICBlbmQKZW5kCgoKCgpsb2NhbCBiYWNrRnVuY3Rpb25TdGFjayA9IHt9CmxvY2FsIGJhY2tCdXR0b24KCmxvY2FsIGZ1bmN0aW9uIGNsZWFyQmFja1N0YWNrKCkKCWZvciBpID0gMSwgI2JhY2tGdW5jdGlvblN0YWNrIGRvCgkJYmFja0Z1bmN0aW9uU3RhY2tbaV0gPSBuaWwKCWVuZAoJYmFja0J1dHRvbi5WaXNpYmxlID0gZmFsc2UKZW5kCgpsb2NhbCBmdW5jdGlvbiBwdXNoQmFja0Z1bmN0aW9uKGZ1bmMpCgl0YWJsZS5pbnNlcnQoYmFja0Z1bmN0aW9uU3RhY2ssIGZ1bmMpCgliYWNrQnV0dG9uLlZpc2libGUgPSB0cnVlCmVuZAoKbG9jYWwgZnVuY3Rpb24gZXhlY3V0ZUJhY2tGdW5jdGlvbigpCglpZiAjYmFja0Z1bmN0aW9uU3RhY2sgPiAwIHRoZW4KCQlsb2NhbCBmdW5jID0gdGFibGUucmVtb3ZlKGJhY2tGdW5jdGlvblN0YWNrKQoJCWlmIGZ1bmMgdGhlbgoJCQlmdW5jKCkKCQllbmQKCWVuZAoJaWYgI2JhY2tGdW5jdGlvblN0YWNrID09IDAgdGhlbgoJCWJhY2tCdXR0b24uVmlzaWJsZSA9IGZhbHNlCgllbmQKZW5kCgoKCgoKCmxvY2FsIGZ1bmN0aW9uIGV4dHJhY3RBbmltYXRpb25zRnJvbUZvbGRlcihmb2xkZXI6IEZvbGRlcik6IHsgW3N0cmluZ106IHN0cmluZyB9CiAgICBsb2NhbCBhbmltcyA9IHt9CiAgICBpZiBub3QgZm9sZGVyIHRoZW4gcmV0dXJuIGFuaW1zIGVuZAogICAgZm9yIF8sIGl0ZW0gaW4gaXBhaXJzKGZvbGRlcjpHZXRDaGlsZHJlbigpKSBkbwogICAgICAgIAogICAgICAgIGlmIGl0ZW06SXNBKCJBbmltYXRpb24iKSBhbmQgaXRlbS5BbmltYXRpb25JZCBhbmQgaXRlbS5BbmltYXRpb25JZCB+PSAiIiB0aGVuCiAgICAgICAgICAgIGFuaW1zW2l0ZW0uTmFtZV0gPSBpdGVtLkFuaW1hdGlvbklkCiAgICAgICAgZW5kCiAgICBlbmQKICAgIHJldHVybiBhbmltcwplbmQKCgpsb2NhbCBmdW5jdGlvbiBkaXNjb3ZlckFsbEtpbGxlckRhdGEoKQogICAgbG9jYWwgYWxsRGF0YSA9IHsKICAgICAgICBLaWxsZXJzID0ge30sCiAgICAgICAgU2tpbnMgPSB7fQogICAgfQogICAgaWYgbm90IGtpbGxlckNoYXJhY3RlcnNGb2xkZXIgdGhlbgogICAgICAgIHdhcm4oItCf0LDQv9C60LAgUmVwbGljYXRlZFN0b3JhZ2UuQ2hhcmFjdGVycy5LaWxsZXIg0L3QtSDQvdCw0LnQtNC10L3QsCEiKQogICAgICAgIHJldHVybiBhbGxEYXRhCiAgICBlbmQKCiAgICBmb3IgXywga2lsbGVyRm9sZGVyIGluIGlwYWlycyhraWxsZXJDaGFyYWN0ZXJzRm9sZGVyOkdldENoaWxkcmVuKCkpIGRvCiAgICAgICAgaWYga2lsbGVyRm9sZGVyOklzQSgiTW9kZWwiKSBvciBraWxsZXJGb2xkZXI6SXNBKCJGb2xkZXIiKSB0aGVuCiAgICAgICAgICAgIGxvY2FsIGtpbGxlck5hbWUgPSBraWxsZXJGb2xkZXIuTmFtZQogICAgICAgICAgICBhbGxEYXRhLlNraW5zW2tpbGxlck5hbWVdID0ge30KCiAgICAgICAgICAgIAogICAgICAgICAgICBsb2NhbCBkZWZhdWx0Rm9sZGVyID0ga2lsbGVyRm9sZGVyOkZpbmRGaXJzdENoaWxkKCJEZWZhdWx0IikKICAgICAgICAgICAgbG9jYWwgZGVmYXVsdEFuaW1zRm9sZGVyID0gZGVmYXVsdEZvbGRlciBhbmQgZGVmYXVsdEZvbGRlcjpGaW5kRmlyc3RDaGlsZCgiQW5pbWF0aW9ucyIpCiAgICAgICAgICAgIGxvY2FsIGRlZmF1bHRBbmltcyA9IGV4dHJhY3RBbmltYXRpb25zRnJvbUZvbGRlcihkZWZhdWx0QW5pbXNGb2xkZXIpCiAgICAgICAgICAgIGFsbERhdGEuS2lsbGVyc1traWxsZXJOYW1lXSA9IGRlZmF1bHRBbmltcwoKICAgICAgICAgICAgCiAgICAgICAgICAgIGZvciBfLCBza2luRm9sZGVyIGluIGlwYWlycyhraWxsZXJGb2xkZXI6R2V0Q2hpbGRyZW4oKSkgZG8KICAgICAgICAgICAgICAgIGlmIChza2luRm9sZGVyOklzQSgiTW9kZWwiKSBvciBza2luRm9sZGVyOklzQSgiRm9sZGVyIikpIGFuZCBza2luRm9sZGVyLk5hbWUgfj0gIkRlZmF1bHQiIHRoZW4KICAgICAgICAgICAgICAgICAgICBsb2NhbCBza2luTmFtZSA9IHNraW5Gb2xkZXIuTmFtZQogICAgICAgICAgICAgICAgICAgIGxvY2FsIHNraW5Bbmltc0ZvbGRlciA9IHNraW5Gb2xkZXI6RmluZEZpcnN0Q2hpbGQoIkFuaW1hdGlvbnMiKQogICAgICAgICAgICAgICAgICAgIGxvY2FsIHNraW5BbmltcyA9IGV4dHJhY3RBbmltYXRpb25zRnJvbUZvbGRlcihza2luQW5pbXNGb2xkZXIpCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgbG9jYWwgZmluYWxTa2luQW5pbXMgPSB7fQogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGZvciBhbmltTmFtZSwgYW5pbUlkIGluIHBhaXJzKGRlZmF1bHRBbmltcykgZG8KICAgICAgICAgICAgICAgICAgICAgICAgZmluYWxTa2luQW5pbXNbYW5pbU5hbWVdID0gYW5pbUlkCiAgICAgICAgICAgICAgICAgICAgZW5kCgogICAgICAgICAgICAgICAgICAgIGxvY2FsIGhhc1VuaXF1ZSA9IGZhbHNlCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgZm9yIGFuaW1OYW1lLCBza2luQW5pbUlkIGluIHBhaXJzKHNraW5BbmltcykgZG8KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGlmIGRlZmF1bHRBbmltc1thbmltTmFtZV0gfj0gc2tpbkFuaW1JZCB0aGVuCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBoYXNVbmlxdWUgPSB0cnVlCiAgICAgICAgICAgICAgICAgICAgICAgIGVuZAogICAgICAgICAgICAgICAgICAgICAgICBmaW5hbFNraW5Bbmltc1thbmltTmFtZV0gPSBza2luQW5pbUlkIAogICAgICAgICAgICAgICAgICAgIGVuZAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGlmIGhhc1VuaXF1ZSB0aGVuCiAgICAgICAgICAgICAgICAgICAgICAgIGFsbERhdGEuU2tpbnNba2lsbGVyTmFtZV1bc2tpbk5hbWVdID0gZmluYWxTa2luQW5pbXMKICAgICAgICAgICAgICAgICAgICBlbmQKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIGVuZAogICAgICAgICAgICBlbmQKICAgICAgICBlbmQKICAgIGVuZAogICAgcmV0dXJuIGFsbERhdGEKZW5kCgoKbG9jYWwgZnVuY3Rpb24gZGlzY292ZXJBbGxTdXJ2aXZvckRhdGEoKQogICAgbG9jYWwgYWxsRGF0YSA9IHt9CiAgICBpZiBub3Qgc3Vydml2b3JDaGFyYWN0ZXJzRm9sZGVyIHRoZW4KICAgICAgICB3YXJuKCLQn9Cw0L/QutCwIFJlcGxpY2F0ZWRTdG9yYWdlLkNoYXJhY3RlcnMuU3Vydml2b3Ig0L3QtSDQvdCw0LnQtNC10L3QsCEiKQogICAgICAgIHJldHVybiBhbGxEYXRhCiAgICBlbmQKCiAgICBsb2NhbCBjaXZpbGlhbkZvbGRlciA9IHN1cnZpdm9yQ2hhcmFjdGVyc0ZvbGRlcjpGaW5kRmlyc3RDaGlsZCgiQ2l2aWxpYW4iKQogICAgaWYgY2l2aWxpYW5Gb2xkZXIgdGhlbgogICAgICAgIGxvY2FsIGFuaW1zRm9sZGVyID0gY2l2aWxpYW5Gb2xkZXI6RmluZEZpcnN0Q2hpbGQoIkFuaW1hdGlvbnMiKQogICAgICAgIGlmIGFuaW1zRm9sZGVyIHRoZW4KICAgICAgICAgICAgCiAgICAgICAgICAgIAogICAgICAgICAgICBsb2NhbCBtb3ZlbWVudEFuaW1zID0gZXh0cmFjdEFuaW1hdGlvbnNGcm9tRm9sZGVyKGFuaW1zRm9sZGVyKQogICAgICAgICAgICAKICAgICAgICAgICAgCiAgICAgICAgICAgIGxvY2FsIGFiaWxpdGllc0ZvbGRlciA9IGFuaW1zRm9sZGVyOkZpbmRGaXJzdENoaWxkKCJBYmlsaXRpZXMiKQogICAgICAgICAgICBsb2NhbCBhYmlsaXR5QW5pbXMgPSBleHRyYWN0QW5pbWF0aW9uc0Zyb21Gb2xkZXIoYWJpbGl0aWVzRm9sZGVyKQoKICAgICAgICAgICAgCiAgICAgICAgICAgIGFsbERhdGFbIkNpdmlsaWFuIl0gPSB7CiAgICAgICAgICAgICAgICBNb3ZlbWVudCA9IG1vdmVtZW50QW5pbXMsCiAgICAgICAgICAgICAgICBBYmlsaXRpZXMgPSBhYmlsaXR5QW5pbXMKICAgICAgICAgICAgfQogICAgICAgIGVuZAogICAgZW5kCiAgICByZXR1cm4gYWxsRGF0YQplbmQKCgoKCgpsb2NhbCBmdW5jdGlvbiBjcmVhdGVDYXRlZ29yeUJ1dHRvbnMoY2F0ZWdvcnlOYW1lOiBzdHJpbmcpCiAgICBsb2NhbCBjdXJyZW50Q2F0ZWdvcnlEYXRhID0gY2F0ZWdvcnlEYXRhW2NhdGVnb3J5TmFtZV0KICAgIGlmIG5vdCBjdXJyZW50Q2F0ZWdvcnlEYXRhIHRoZW4gcmV0dXJuIGVuZAoKICAgIAogICAgZm9yIF8sIGJ1dHRvbiBpbiBwYWlycyhjdXJyZW50Q2F0ZWdvcnlEYXRhLmJ1dHRvbnMpIGRvIGJ1dHRvbjpEZXN0cm95KCkgZW5kCiAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmJ1dHRvbnMgPSB7fQogICAgY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzID0ge30KCiAgICBpZiBjYXRlZ29yeU5hbWUgPT0gIktpbGxlciBBbmltYXRpb25zIiB0aGVuCiAgICAgICAgbG9jYWwgZGF0YVNvdXJjZSA9IGN1cnJlbnRDYXRlZ29yeURhdGEuZGF0YVNvdXJjZQogICAgICAgIGZvciBjaGFyYWN0ZXJOYW1lLCBjaGFyYWN0ZXJBbmltcyBpbiBwYWlycyhkYXRhU291cmNlKSBkbwogICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNbY2hhcmFjdGVyTmFtZV0gPSB7IGRhdGEgPSBjaGFyYWN0ZXJBbmltcywgYnV0dG9ucyA9IHt9IH0KCiAgICAgICAgICAgIGxvY2FsIHN1YkNhdGVnb3J5QnV0dG9uID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIiwgY3VycmVudENhdGVnb3J5RGF0YS5zY3JvbGxpbmdGcmFtZSkKICAgICAgICAgICAgc3ViQ2F0ZWdvcnlCdXR0b24uTmFtZSA9IGNoYXJhY3Rlck5hbWUgLi4gIlN1YkNhdGVnb3J5QnV0dG9uIgogICAgICAgICAgICBzdWJDYXRlZ29yeUJ1dHRvbi5TaXplID0gVURpbTIubmV3KDEsIC0xMCwgMCwgNDApCiAgICAgICAgICAgIHN1YkNhdGVnb3J5QnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig4MCwgODAsIDgwKQogICAgICAgICAgICBzdWJDYXRlZ29yeUJ1dHRvbi5UZXh0ID0gY2hhcmFjdGVyTmFtZQogICAgICAgICAgICBzdWJDYXRlZ29yeUJ1dHRvbi5Gb250ID0gRW51bS5Gb250LlNvdXJjZVNhbnNCb2xkCiAgICAgICAgICAgIHN1YkNhdGVnb3J5QnV0dG9uLlRleHRTaXplID0gMTgKCQkJc3ViQ2F0ZWdvcnlCdXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5uZXcoMSwxLDEpCgogICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmJ1dHRvbnNbY2hhcmFjdGVyTmFtZV0gPSBzdWJDYXRlZ29yeUJ1dHRvbgoKICAgICAgICAgICAgc3ViQ2F0ZWdvcnlCdXR0b24uTW91c2VCdXR0b24xQ2xpY2s6Q29ubmVjdChmdW5jdGlvbigpCiAgICAgICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLlZpc2libGUgPSBmYWxzZQogICAgICAgICAgICAgICAgY3VycmVudFN1YkNhdGVnb3J5ID0gY2hhcmFjdGVyTmFtZQoJCQkJc3RhcnRNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKGNoYXJhY3RlckFuaW1zKQoJCQkJCiAgICAgICAgICAgICAgICBsb2NhbCBzdWJDYXRGcmFtZSA9IGN1cnJlbnRDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllc1tjaGFyYWN0ZXJOYW1lXS5zY3JvbGxpbmdGcmFtZQogICAgICAgICAgICAgICAgaWYgbm90IHN1YkNhdEZyYW1lIHRoZW4KICAgICAgICAgICAgICAgICAgICBzdWJDYXRGcmFtZSA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiLCBtYWluRnJhbWUpCiAgICAgICAgICAgICAgICAgICAgc3ViQ2F0RnJhbWUuTmFtZSA9IGNoYXJhY3Rlck5hbWUgLi4gIkFuaW1hdGlvbnNDb250YWluZXIiCiAgICAgICAgICAgICAgICAgICAgc3ViQ2F0RnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAtODApCiAgICAgICAgICAgICAgICAgICAgc3ViQ2F0RnJhbWUuUG9zaXRpb24gPSBVRGltMi5uZXcoMCwgMCwgMCwgODApCiAgICAgICAgICAgICAgICAgICAgc3ViQ2F0RnJhbWUuQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDM1LCAzNSwgMzUpCgkJCQkJCiAgICAgICAgICAgICAgICAgICAgbG9jYWwgc3ViQ2F0TGF5b3V0ID0gSW5zdGFuY2UubmV3KCJVSUxpc3RMYXlvdXQiLCBzdWJDYXRGcmFtZSkKICAgICAgICAgICAgICAgICAgICBzdWJDYXRMYXlvdXQuUGFkZGluZyA9IFVEaW0ubmV3KDAsIDUpCgogICAgICAgICAgICAgICAgICAgIGN1cnJlbnRDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllc1tjaGFyYWN0ZXJOYW1lXS5zY3JvbGxpbmdGcmFtZSA9IHN1YkNhdEZyYW1lCiAgICAgICAgICAgICAgICAgICAgY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdLnVpTGlzdExheW91dCA9IHN1YkNhdExheW91dAoKCQkJCQlsb2NhbCBhdXRvQW5pbXNCdG4gPSBjcmVhdGVLaWxsZXJBdXRvQW5pbXNCdXR0b24oc3ViQ2F0RnJhbWUsIGNoYXJhY3RlckFuaW1zKQoJCQkJCXRhYmxlLmluc2VydChjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNbY2hhcmFjdGVyTmFtZV0uYnV0dG9ucywgYXV0b0FuaW1zQnRuKQoJCQkJCQoJCQkJCWNyZWF0ZUFuaW1hdGlvbkJ1dHRvbnMoc3ViQ2F0RnJhbWUsIGNoYXJhY3RlckFuaW1zLCBjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNbY2hhcmFjdGVyTmFtZV0uYnV0dG9ucykKICAgICAgICAgICAgICAgIGVuZAoKICAgICAgICAgICAgICAgIHN1YkNhdEZyYW1lLlZpc2libGUgPSB0cnVlCiAgICAgICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUZyYW1lID0gc3ViQ2F0RnJhbWUKICAgICAgICAgICAgICAgIGN1cnJlbnRDYXRlZ29yeURhdGEuY3VycmVudFN1YkNhdGVnb3J5TGF5b3V0ID0gc3ViQ2F0RnJhbWU6RmluZEZpcnN0Q2hpbGRPZkNsYXNzKCJVSUxpc3RMYXlvdXQiKQogICAgICAgICAgICAgICAgdXBkYXRlQ2FudmFzU2l6ZShzdWJDYXRGcmFtZSwgY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U3ViQ2F0ZWdvcnlMYXlvdXQpCiAgICAgICAgICAgICAgICAKCQkJCXB1c2hCYWNrRnVuY3Rpb24oZnVuY3Rpb24oKQoJCQkJCXN0b3BNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKCkKCQkJCQlzdWJDYXRGcmFtZS5WaXNpYmxlID0gZmFsc2UKCQkJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLlZpc2libGUgPSB0cnVlCgkJCQkJY3VycmVudFN1YkNhdGVnb3J5ID0gbmlsCgkJCQkJY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IG5pbAoJCQkJZW5kKQogICAgICAgICAgICBlbmQpCiAgICAgICAgZW5kCiAgICAgICAgdXBkYXRlQ2FudmFzU2l6ZShjdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLCBjdXJyZW50Q2F0ZWdvcnlEYXRhLnVpTGlzdExheW91dCkKCiAgICBlbHNlaWYgY2F0ZWdvcnlOYW1lID09ICJLaWxsZXItU2tpbnMgQW5pbSIgdGhlbgogICAgICAgIGxvY2FsIGRhdGFTb3VyY2UgPSBjdXJyZW50Q2F0ZWdvcnlEYXRhLmRhdGFTb3VyY2UKICAgICAgICBmb3Iga2lsbGVyTmFtZSwga2lsbGVyU2tpbnNEYXRhIGluIHBhaXJzKGRhdGFTb3VyY2UpIGRvCiAgICAgICAgICAgIAogICAgICAgICAgICBpZiBuZXh0KGtpbGxlclNraW5zRGF0YSkgPT0gbmlsIHRoZW4gY29udGludWUgZW5kCgogICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV0gPSB7IGJ1dHRvbnMgPSB7fSB9CgogICAgICAgICAgICBsb2NhbCBraWxsZXJCdXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iLCBjdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lKQogICAgICAgICAgICBraWxsZXJCdXR0b24uTmFtZSA9IGtpbGxlck5hbWUgLi4gIktpbGxlckJ1dHRvbiIKICAgICAgICAgICAga2lsbGVyQnV0dG9uLlNpemUgPSBVRGltMi5uZXcoMSwgLTEwLCAwLCA0MCkKICAgICAgICAgICAga2lsbGVyQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig4MCwgODAsIDgwKQogICAgICAgICAgICBraWxsZXJCdXR0b24uVGV4dCA9IGtpbGxlck5hbWUKICAgICAgICAgICAga2lsbGVyQnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKCQkJa2lsbGVyQnV0dG9uLlRleHRTaXplID0gMTgKCQkJa2lsbGVyQnV0dG9uLlRleHRDb2xvcjMgPSBDb2xvcjMubmV3KDEsMSwxKQogICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmJ1dHRvbnNba2lsbGVyTmFtZV0gPSBraWxsZXJCdXR0b24KCiAgICAgICAgICAgIGtpbGxlckJ1dHRvbi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKICAgICAgICAgICAgICAgIGN1cnJlbnRDYXRlZ29yeURhdGEuc2Nyb2xsaW5nRnJhbWUuVmlzaWJsZSA9IGZhbHNlCiAgICAgICAgICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnkgPSBraWxsZXJOYW1lCgogICAgICAgICAgICAgICAgbG9jYWwga2lsbGVyRnJhbWUgPSBjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV0uc2Nyb2xsaW5nRnJhbWUKICAgICAgICAgICAgICAgIGlmIG5vdCBraWxsZXJGcmFtZSB0aGVuCiAgICAgICAgICAgICAgICAgICAga2lsbGVyRnJhbWUgPSBJbnN0YW5jZS5uZXcoIlNjcm9sbGluZ0ZyYW1lIiwgbWFpbkZyYW1lKQogICAgICAgICAgICAgICAgICAgIGtpbGxlckZyYW1lLk5hbWUgPSBraWxsZXJOYW1lIC4uICJTa2luc0NvbnRhaW5lciIKICAgICAgICAgICAgICAgICAgICBraWxsZXJGcmFtZS5TaXplID0gVURpbTIubmV3KDEsIDAsIDEsIC04MCkKICAgICAgICAgICAgICAgICAgICBraWxsZXJGcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCAwLCAwLCA4MCkKCQkJCQlraWxsZXJGcmFtZS5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMzUsIDM1LCAzNSkKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBsb2NhbCBraWxsZXJMYXlvdXQgPSBJbnN0YW5jZS5uZXcoIlVJTGlzdExheW91dCIsIGtpbGxlckZyYW1lKQogICAgICAgICAgICAgICAgICAgIGtpbGxlckxheW91dC5QYWRkaW5nID0gVURpbS5uZXcoMCwgNSkKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV0uc2Nyb2xsaW5nRnJhbWUgPSBraWxsZXJGcmFtZQogICAgICAgICAgICAgICAgICAgIGN1cnJlbnRDYXRlZ29yeURhdGEuc2tpblN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV0gPSB7fQoKICAgICAgICAgICAgICAgICAgICBmb3Igc2tpbk5hbWUsIHNraW5EYXRhIGluIHBhaXJzKGtpbGxlclNraW5zRGF0YSkgZG8KICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudENhdGVnb3J5RGF0YS5za2luU3ViQ2F0ZWdvcmllc1traWxsZXJOYW1lXVtza2luTmFtZV0gPSB7IGRhdGEgPSBza2luRGF0YSwgYnV0dG9ucyA9IHt9IH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsIHNraW5CdXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iLCBraWxsZXJGcmFtZSkKICAgICAgICAgICAgICAgICAgICAgICAgc2tpbkJ1dHRvbi5OYW1lID0gc2tpbk5hbWUgLi4gIlNraW5CdXR0b24iCiAgICAgICAgICAgICAgICAgICAgICAgIHNraW5CdXR0b24uU2l6ZSA9IFVEaW0yLm5ldygxLCAtMTAsIDAsIDQwKQogICAgICAgICAgICAgICAgICAgICAgICBza2luQnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig3MCwgNzAsIDcwKQogICAgICAgICAgICAgICAgICAgICAgICBza2luQnV0dG9uLlRleHQgPSBza2luTmFtZQogICAgICAgICAgICAgICAgICAgICAgICBza2luQnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKCQkJCQkJc2tpbkJ1dHRvbi5UZXh0U2l6ZSA9IDE4CgkJCQkJCXNraW5CdXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5uZXcoMSwxLDEpCiAgICAgICAgICAgICAgICAgICAgICAgIHRhYmxlLmluc2VydChjdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV0uYnV0dG9ucywgc2tpbkJ1dHRvbikKCiAgICAgICAgICAgICAgICAgICAgICAgIHNraW5CdXR0b24uTW91c2VCdXR0b24xQ2xpY2s6Q29ubmVjdChmdW5jdGlvbigpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBraWxsZXJGcmFtZS5WaXNpYmxlID0gZmFsc2UKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN1cnJlbnRTa2luTmFtZSA9IHNraW5OYW1lCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGFydE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoc2tpbkRhdGEpCgogICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9jYWwgc2tpbkFuaW1GcmFtZSA9IGN1cnJlbnRDYXRlZ29yeURhdGEuc2tpblN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV1bc2tpbk5hbWVdLnNjcm9sbGluZ0ZyYW1lCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiBub3Qgc2tpbkFuaW1GcmFtZSB0aGVuCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2tpbkFuaW1GcmFtZSA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiLCBtYWluRnJhbWUpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2tpbkFuaW1GcmFtZS5OYW1lID0gc2tpbk5hbWUgLi4gIkFuaW1zQ29udGFpbmVyIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNraW5BbmltRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAtODApCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2tpbkFuaW1GcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCAwLCAwLCA4MCkKCQkJCQkJCQlza2luQW5pbUZyYW1lLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigzNSwgMzUsIDM1KQoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb2NhbCBza2luQW5pbUxheW91dCA9IEluc3RhbmNlLm5ldygiVUlMaXN0TGF5b3V0Iiwgc2tpbkFuaW1GcmFtZSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBza2luQW5pbUxheW91dC5QYWRkaW5nID0gVURpbS5uZXcoMCwgNSkKCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudENhdGVnb3J5RGF0YS5za2luU3ViQ2F0ZWdvcmllc1traWxsZXJOYW1lXVtza2luTmFtZV0uc2Nyb2xsaW5nRnJhbWUgPSBza2luQW5pbUZyYW1lCgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsIGF1dG9Bbmltc0J0biA9IGNyZWF0ZUtpbGxlckF1dG9Bbmltc0J1dHRvbihza2luQW5pbUZyYW1lLCBza2luRGF0YSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWJsZS5pbnNlcnQoY3VycmVudENhdGVnb3J5RGF0YS5za2luU3ViQ2F0ZWdvcmllc1traWxsZXJOYW1lXVtza2luTmFtZV0uYnV0dG9ucywgYXV0b0FuaW1zQnRuKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNyZWF0ZUFuaW1hdGlvbkJ1dHRvbnMoc2tpbkFuaW1GcmFtZSwgc2tpbkRhdGEsIGN1cnJlbnRDYXRlZ29yeURhdGEuc2tpblN1YkNhdGVnb3JpZXNba2lsbGVyTmFtZV1bc2tpbk5hbWVdLmJ1dHRvbnMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbmQKICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgc2tpbkFuaW1GcmFtZS5WaXNpYmxlID0gdHJ1ZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U2tpbkZyYW1lID0gc2tpbkFuaW1GcmFtZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgdXBkYXRlQ2FudmFzU2l6ZShza2luQW5pbUZyYW1lLCBza2luQW5pbUZyYW1lOkZpbmRGaXJzdENoaWxkT2ZDbGFzcygiVUlMaXN0TGF5b3V0IikpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKCQkJCQkJCXB1c2hCYWNrRnVuY3Rpb24oZnVuY3Rpb24oKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0b3BNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBza2luQW5pbUZyYW1lLlZpc2libGUgPSBmYWxzZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGtpbGxlckZyYW1lLlZpc2libGUgPSB0cnVlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudFNraW5OYW1lID0gbmlsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U2tpbkZyYW1lID0gbmlsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbmQpCiAgICAgICAgICAgICAgICAgICAgICAgIGVuZCkKICAgICAgICAgICAgICAgICAgICBlbmQKICAgICAgICAgICAgICAgIGVuZAoKICAgICAgICAgICAgICAgIGtpbGxlckZyYW1lLlZpc2libGUgPSB0cnVlCiAgICAgICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUZyYW1lID0ga2lsbGVyRnJhbWUKICAgICAgICAgICAgICAgIHVwZGF0ZUNhbnZhc1NpemUoa2lsbGVyRnJhbWUsIGtpbGxlckZyYW1lOkZpbmRGaXJzdENoaWxkT2ZDbGFzcygiVUlMaXN0TGF5b3V0IikpCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIHB1c2hCYWNrRnVuY3Rpb24oZnVuY3Rpb24oKQogICAgICAgICAgICAgICAgICAgIGtpbGxlckZyYW1lLlZpc2libGUgPSBmYWxzZQogICAgICAgICAgICAgICAgICAgIGN1cnJlbnRDYXRlZ29yeURhdGEuc2Nyb2xsaW5nRnJhbWUuVmlzaWJsZSA9IHRydWUKICAgICAgICAgICAgICAgICAgICBjdXJyZW50U3ViQ2F0ZWdvcnkgPSBuaWwKICAgICAgICAgICAgICAgICAgICBjdXJyZW50Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUZyYW1lID0gbmlsCiAgICAgICAgICAgICAgICBlbmQpCiAgICAgICAgICAgIGVuZCkKICAgICAgICBlbmQKICAgICAgICB1cGRhdGVDYW52YXNTaXplKGN1cnJlbnRDYXRlZ29yeURhdGEuc2Nyb2xsaW5nRnJhbWUsIGN1cnJlbnRDYXRlZ29yeURhdGEudWlMaXN0TGF5b3V0KQoJCQoJCgllbHNlaWYgY2F0ZWdvcnlOYW1lID09ICJTdXJ2aXZvcnMgQW5pbWF0aW9ucyIgdGhlbgoJCWxvY2FsIGRhdGFTb3VyY2UgPSBjdXJyZW50Q2F0ZWdvcnlEYXRhLmRhdGFTb3VyY2UKCQlmb3IgY2hhcmFjdGVyTmFtZSwgY2hhcmFjdGVyRGF0YSBpbiBwYWlycyhkYXRhU291cmNlKSBkbwoJCQkKCQkJY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdID0geyBkYXRhID0gY2hhcmFjdGVyRGF0YSwgYnV0dG9ucyA9IHt9IH0KCgkJCWxvY2FsIHN1YkNhdGVnb3J5QnV0dG9uID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIiwgY3VycmVudENhdGVnb3J5RGF0YS5zY3JvbGxpbmdGcmFtZSkKCQkJc3ViQ2F0ZWdvcnlCdXR0b24uTmFtZSA9IGNoYXJhY3Rlck5hbWUgLi4gIlN1YkNhdGVnb3J5QnV0dG9uIgoJCQlzdWJDYXRlZ29yeUJ1dHRvbi5TaXplID0gVURpbTIubmV3KDEsIC0xMCwgMCwgNDApCgkJCXN1YkNhdGVnb3J5QnV0dG9uLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig4MCwgODAsIDgwKQoJCQlzdWJDYXRlZ29yeUJ1dHRvbi5UZXh0ID0gY2hhcmFjdGVyTmFtZQoJCQlzdWJDYXRlZ29yeUJ1dHRvbi5Gb250ID0gRW51bS5Gb250LlNvdXJjZVNhbnNCb2xkCgkJCXN1YkNhdGVnb3J5QnV0dG9uLlRleHRTaXplID0gMTgKCQkJc3ViQ2F0ZWdvcnlCdXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5uZXcoMSwxLDEpCgoJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLmJ1dHRvbnNbY2hhcmFjdGVyTmFtZV0gPSBzdWJDYXRlZ29yeUJ1dHRvbgoKCQkJc3ViQ2F0ZWdvcnlCdXR0b24uTW91c2VCdXR0b24xQ2xpY2s6Q29ubmVjdChmdW5jdGlvbigpCgkJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLlZpc2libGUgPSBmYWxzZQoJCQkJY3VycmVudFN1YkNhdGVnb3J5ID0gY2hhcmFjdGVyTmFtZQoJCQkJCgkJCQlzdGFydE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoY2hhcmFjdGVyRGF0YS5Nb3ZlbWVudCkKCgkJCQlsb2NhbCBzdWJDYXRGcmFtZSA9IGN1cnJlbnRDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllc1tjaGFyYWN0ZXJOYW1lXS5zY3JvbGxpbmdGcmFtZQoJCQkJaWYgbm90IHN1YkNhdEZyYW1lIHRoZW4KCQkJCQlzdWJDYXRGcmFtZSA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiLCBtYWluRnJhbWUpCgkJCQkJc3ViQ2F0RnJhbWUuTmFtZSA9IGNoYXJhY3Rlck5hbWUgLi4gIkFuaW1hdGlvbnNDb250YWluZXIiCgkJCQkJc3ViQ2F0RnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAtODApCgkJCQkJc3ViQ2F0RnJhbWUuUG9zaXRpb24gPSBVRGltMi5uZXcoMCwgMCwgMCwgODApCgkJCQkJc3ViQ2F0RnJhbWUuQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDM1LCAzNSwgMzUpCgoJCQkJCWxvY2FsIHN1YkNhdExheW91dCA9IEluc3RhbmNlLm5ldygiVUlMaXN0TGF5b3V0Iiwgc3ViQ2F0RnJhbWUpCgkJCQkJc3ViQ2F0TGF5b3V0LlBhZGRpbmcgPSBVRGltLm5ldygwLCA1KQoKCQkJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLnN1YkNhdGVnb3JpZXNbY2hhcmFjdGVyTmFtZV0uc2Nyb2xsaW5nRnJhbWUgPSBzdWJDYXRGcmFtZQoJCQkJCWN1cnJlbnRDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllc1tjaGFyYWN0ZXJOYW1lXS51aUxpc3RMYXlvdXQgPSBzdWJDYXRMYXlvdXQKCQkJCQkKCQkJCQkKCQkJCQlsb2NhbCBhdXRvQW5pbUJ1dHRvbnMgPSBjcmVhdGVTdXJ2aXZvckF1dG9Bbmltc0J1dHRvbnMoc3ViQ2F0RnJhbWUsIGNoYXJhY3RlckRhdGEuTW92ZW1lbnQpCgkJCQkJZm9yIF8sIGJ0biBpbiBpcGFpcnMoYXV0b0FuaW1CdXR0b25zKSBkbwoJCQkJCQl0YWJsZS5pbnNlcnQoY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdLmJ1dHRvbnMsIGJ0bikKCQkJCQllbmQKCQkJCQkKCQkJCQkKCQkJCQlpZiBuZXh0KGNoYXJhY3RlckRhdGEuQWJpbGl0aWVzKSB0aGVuCgkJCQkJCWxvY2FsIGFiaWxpdGllc0J1dHRvbiA9IEluc3RhbmNlLm5ldygiVGV4dEJ1dHRvbiIpCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5OYW1lID0gIkFiaWxpdGllc0J1dHRvbiIKCQkJCQkJYWJpbGl0aWVzQnV0dG9uLlBhcmVudCA9IHN1YkNhdEZyYW1lCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5TaXplID0gVURpbTIubmV3KDEsIC0xMCwgMCwgNDApCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoOTAsIDYwLCAxMzApIAoJCQkJCQlhYmlsaXRpZXNCdXR0b24uQm9yZGVyQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKCQkJCQkJYWJpbGl0aWVzQnV0dG9uLlRleHRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQoJCQkJCQlhYmlsaXRpZXNCdXR0b24uVGV4dCA9ICJBYmlsaXRpZXMiCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5Gb250ID0gRW51bS5Gb250LlNvdXJjZVNhbnNCb2xkCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5UZXh0U2l6ZSA9IDE4CgkJCQkJCWFiaWxpdGllc0J1dHRvbi5MYXlvdXRPcmRlciA9IC01MAoJCQkJCQl0YWJsZS5pbnNlcnQoY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdLmJ1dHRvbnMsIGFiaWxpdGllc0J1dHRvbikKCQkJCQkJCgkJCQkJCWFiaWxpdGllc0J1dHRvbi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKCQkJCQkJCXN1YkNhdEZyYW1lLlZpc2libGUgPSBmYWxzZQoJCQkJCQkJCgkJCQkJCQlsb2NhbCBhYmlsaXRpZXNGcmFtZSA9IGN1cnJlbnRDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllc1tjaGFyYWN0ZXJOYW1lXS5hYmlsaXRpZXNGcmFtZQoJCQkJCQkJaWYgbm90IGFiaWxpdGllc0ZyYW1lIHRoZW4KCQkJCQkJCQlhYmlsaXRpZXNGcmFtZSA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiLCBtYWluRnJhbWUpCgkJCQkJCQkJYWJpbGl0aWVzRnJhbWUuTmFtZSA9ICJBYmlsaXRpZXNDb250YWluZXIiCgkJCQkJCQkJYWJpbGl0aWVzRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAtODApCgkJCQkJCQkJYWJpbGl0aWVzRnJhbWUuUG9zaXRpb24gPSBVRGltMi5uZXcoMCwgMCwgMCwgODApCgkJCQkJCQkJYWJpbGl0aWVzRnJhbWUuQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDM1LCAzNSwgMzUpCgkJCQkJCQkJCgkJCQkJCQkJbG9jYWwgYWJpbGl0aWVzTGF5b3V0ID0gSW5zdGFuY2UubmV3KCJVSUxpc3RMYXlvdXQiLCBhYmlsaXRpZXNGcmFtZSkKCQkJCQkJCQlhYmlsaXRpZXNMYXlvdXQuUGFkZGluZyA9IFVEaW0ubmV3KDAsIDUpCgkJCQkJCQkJCgkJCQkJCQkJY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdLmFiaWxpdGllc0ZyYW1lID0gYWJpbGl0aWVzRnJhbWUKCQkJCQkJCQkKCQkJCQkJCQkKCQkJCQkJCQljcmVhdGVBbmltYXRpb25CdXR0b25zKGFiaWxpdGllc0ZyYW1lLCBjaGFyYWN0ZXJEYXRhLkFiaWxpdGllcywge30pIAoJCQkJCQkJZW5kCgkJCQkJCQkKCQkJCQkJCWFiaWxpdGllc0ZyYW1lLlZpc2libGUgPSB0cnVlCgkJCQkJCQl1cGRhdGVDYW52YXNTaXplKGFiaWxpdGllc0ZyYW1lLCBhYmlsaXRpZXNGcmFtZTpGaW5kRmlyc3RDaGlsZE9mQ2xhc3MoIlVJTGlzdExheW91dCIpKQoJCQkJCQkJCgkJCQkJCQlwdXNoQmFja0Z1bmN0aW9uKGZ1bmN0aW9uKCkKCQkJCQkJCQlhYmlsaXRpZXNGcmFtZS5WaXNpYmxlID0gZmFsc2UKCQkJCQkJCQlzdWJDYXRGcmFtZS5WaXNpYmxlID0gdHJ1ZQoJCQkJCQkJZW5kKQoJCQkJCQllbmQpCgkJCQkJZW5kCgkJCQkJCgkJCQkJCgkJCQkJY3JlYXRlQW5pbWF0aW9uQnV0dG9ucyhzdWJDYXRGcmFtZSwgY2hhcmFjdGVyRGF0YS5Nb3ZlbWVudCwgY3VycmVudENhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzW2NoYXJhY3Rlck5hbWVdLmJ1dHRvbnMpCgkJCQllbmQKCgkJCQlzdWJDYXRGcmFtZS5WaXNpYmxlID0gdHJ1ZQoJCQkJY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IHN1YkNhdEZyYW1lCgkJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUxheW91dCA9IHN1YkNhdEZyYW1lOkZpbmRGaXJzdENoaWxkT2ZDbGFzcygiVUlMaXN0TGF5b3V0IikKCQkJCXVwZGF0ZUNhbnZhc1NpemUoc3ViQ2F0RnJhbWUsIGN1cnJlbnRDYXRlZ29yeURhdGEuY3VycmVudFN1YkNhdGVnb3J5TGF5b3V0KQoKCQkJCXB1c2hCYWNrRnVuY3Rpb24oZnVuY3Rpb24oKQoJCQkJCXN0b3BNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKCkKCQkJCQlzdWJDYXRGcmFtZS5WaXNpYmxlID0gZmFsc2UKCQkJCQljdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLlZpc2libGUgPSB0cnVlCgkJCQkJY3VycmVudFN1YkNhdGVnb3J5ID0gbmlsCgkJCQkJY3VycmVudENhdGVnb3J5RGF0YS5jdXJyZW50U3ViQ2F0ZWdvcnlGcmFtZSA9IG5pbAoJCQkJCWlzU3Vydml2b3JBdXRvQW5pbXNFbmFibGVkID0gZmFsc2UgCgkJCQkJaXNTdXJ2aXZvckh1cnRBbmltc0VuYWJsZWQgPSBmYWxzZQoJCQkJZW5kKQoJCQllbmQpCgkJZW5kCgkJdXBkYXRlQ2FudmFzU2l6ZShjdXJyZW50Q2F0ZWdvcnlEYXRhLnNjcm9sbGluZ0ZyYW1lLCBjdXJyZW50Q2F0ZWdvcnlEYXRhLnVpTGlzdExheW91dCkKCWVuZAplbmQKCgpiYWNrQnV0dG9uID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIikKYmFja0J1dHRvbi5OYW1lID0gIkJhY2tCdXR0b24iCmJhY2tCdXR0b24uUGFyZW50ID0gbWFpbkZyYW1lCmJhY2tCdXR0b24uU2l6ZSA9IFVEaW0yLm5ldygwLCA2MCwgMCwgMzApCmJhY2tCdXR0b24uUG9zaXRpb24gPSBVRGltMi5uZXcoMCwgNSwgMCwgNDUpCmJhY2tCdXR0b24uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDcwLCA3MCwgNzApCmJhY2tCdXR0b24uQm9yZGVyQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKYmFja0J1dHRvbi5UZXh0Q29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKYmFja0J1dHRvbi5UZXh0ID0gIuKGkCBCYWNrIgpiYWNrQnV0dG9uLkZvbnQgPSBFbnVtLkZvbnQuU291cmNlU2Fuc0JvbGQKYmFja0J1dHRvbi5UZXh0U2l6ZSA9IDE0CmJhY2tCdXR0b24uWkluZGV4ID0gMgpiYWNrQnV0dG9uLlZpc2libGUgPSBmYWxzZQpiYWNrQnV0dG9uLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZXhlY3V0ZUJhY2tGdW5jdGlvbikKCgpsb2NhbCBmdW5jdGlvbiBzd2l0Y2hUb0NhdGVnb3J5KG5ld0NhdGVnb3J5TmFtZTogc3RyaW5nKQogICAgaWYgY3VycmVudENhdGVnb3J5ID09IG5ld0NhdGVnb3J5TmFtZSBhbmQgbm90IGN1cnJlbnRTdWJDYXRlZ29yeSBhbmQgbm90IGN1cnJlbnRTa2luTmFtZSB0aGVuIHJldHVybiBlbmQKCQoJc3RvcE1vdmVtZW50QW5pbWF0aW9uT3ZlcnJpZGUoKQoJY2xlYXJCYWNrU3RhY2soKQoKICAgIGxvY2FsIHByZXZDYXRlZ29yeURhdGEgPSBjYXRlZ29yeURhdGFbY3VycmVudENhdGVnb3J5XQogICAgaWYgcHJldkNhdGVnb3J5RGF0YSB0aGVuCiAgICAgICAgaWYgcHJldkNhdGVnb3J5RGF0YS5zY3JvbGxpbmdGcmFtZSB0aGVuIHByZXZDYXRlZ29yeURhdGEuc2Nyb2xsaW5nRnJhbWUuVmlzaWJsZSA9IGZhbHNlIGVuZAogICAgICAgIGlmIHByZXZDYXRlZ29yeURhdGEuY3VycmVudFN1YkNhdGVnb3J5RnJhbWUgdGhlbiBwcmV2Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTdWJDYXRlZ29yeUZyYW1lLlZpc2libGUgPSBmYWxzZSBlbmQKCQlpZiBwcmV2Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTa2luRnJhbWUgdGhlbiBwcmV2Q2F0ZWdvcnlEYXRhLmN1cnJlbnRTa2luRnJhbWUuVmlzaWJsZSA9IGZhbHNlIGVuZAoJCQoJCWlmIHByZXZDYXRlZ29yeURhdGEuc3ViQ2F0ZWdvcmllcyB0aGVuCgkJCWZvciBfLCBzdWJDYXQgaW4gcGFpcnMocHJldkNhdGVnb3J5RGF0YS5zdWJDYXRlZ29yaWVzKSBkbwoJCQkJaWYgc3ViQ2F0LmFiaWxpdGllc0ZyYW1lIHRoZW4gc3ViQ2F0LmFiaWxpdGllc0ZyYW1lLlZpc2libGUgPSBmYWxzZSBlbmQKCQkJZW5kCgkJZW5kCiAgICBlbmQKIAogICAgY3VycmVudFN1YkNhdGVnb3J5ID0gbmlsCgljdXJyZW50U2tpbk5hbWUgPSBuaWwKCiAgICBsb2NhbCBuZXdDYXRlZ29yeURhdGEgPSBjYXRlZ29yeURhdGFbbmV3Q2F0ZWdvcnlOYW1lXQogICAgaWYgbmV3Q2F0ZWdvcnlEYXRhIGFuZCBuZXdDYXRlZ29yeURhdGEuc2Nyb2xsaW5nRnJhbWUgdGhlbgogICAgICAgIG5ld0NhdGVnb3J5RGF0YS5zY3JvbGxpbmdGcmFtZS5WaXNpYmxlID0gdHJ1ZQogICAgICAgIGN1cnJlbnRDYXRlZ29yeSA9IG5ld0NhdGVnb3J5TmFtZQogICAgZW5kCmVuZAoKCgpmb3IgY2F0TmFtZSwgY2F0RGF0YSBpbiBwYWlycyhjYXRlZ29yeURhdGEpIGRvCiAgICBsb2NhbCBzY3JvbGxpbmdGcmFtZSA9IEluc3RhbmNlLm5ldygiU2Nyb2xsaW5nRnJhbWUiKQogICAgc2Nyb2xsaW5nRnJhbWUuTmFtZSA9IGNhdE5hbWUgLi4gIkNvbnRhaW5lciIKICAgIHNjcm9sbGluZ0ZyYW1lLlBhcmVudCA9IG1haW5GcmFtZQogICAgc2Nyb2xsaW5nRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAtODApCiAgICBzY3JvbGxpbmdGcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCAwLCAwLCA4MCkKICAgIHNjcm9sbGluZ0ZyYW1lLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigzNSwgMzUsIDM1KQogICAgc2Nyb2xsaW5nRnJhbWUuQm9yZGVyU2l6ZVBpeGVsID0gMAogICAgc2Nyb2xsaW5nRnJhbWUuU2Nyb2xsQmFySW1hZ2VDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQigyNTUsIDI1NSwgMjU1KQogICAgc2Nyb2xsaW5nRnJhbWUuVmlzaWJsZSA9IGZhbHNlCgogICAgbG9jYWwgdWlMaXN0TGF5b3V0ID0gSW5zdGFuY2UubmV3KCJVSUxpc3RMYXlvdXQiKQogICAgdWlMaXN0TGF5b3V0LlBhcmVudCA9IHNjcm9sbGluZ0ZyYW1lCiAgICB1aUxpc3RMYXlvdXQuUGFkZGluZyA9IFVEaW0ubmV3KDAsIDUpCgogICAgY2F0RGF0YS5zY3JvbGxpbmdGcmFtZSA9IHNjcm9sbGluZ0ZyYW1lCiAgICBjYXREYXRhLnVpTGlzdExheW91dCA9IHVpTGlzdExheW91dAplbmQKCmxvY2FsIGNhdGVnb3J5QnV0dG9uTmFtZXMgPSB7IktpbGxlciBBbmltYXRpb25zIiwgIktpbGxlci1Ta2lucyBBbmltIiwgIlN1cnZpdm9ycyBBbmltYXRpb25zIn0KZm9yIGksIGNhdE5hbWUgaW4gaXBhaXJzKGNhdGVnb3J5QnV0dG9uTmFtZXMpIGRvCiAgICBsb2NhbCBidXR0b24gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iKQogICAgYnV0dG9uLk5hbWUgPSBjYXROYW1lIC4uICJUYWIiCiAgICBidXR0b24uUGFyZW50ID0gY2F0ZWdvcnlCdXR0b25zRnJhbWUKICAgIGJ1dHRvbi5TaXplID0gVURpbTIubmV3KDEvI2NhdGVnb3J5QnV0dG9uTmFtZXMsIC01LCAxLCAtMTApCiAgICBidXR0b24uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDUwLCA1MCwgNTApCiAgICBidXR0b24uVGV4dENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCiAgICBidXR0b24uVGV4dCA9IGNhdE5hbWUKICAgIGJ1dHRvbi5Gb250ID0gRW51bS5Gb250LlNvdXJjZVNhbnNCb2xkCiAgICBidXR0b24uVGV4dFNpemUgPSAxNgogICAgYnV0dG9uLkxheW91dE9yZGVyID0gaQoKICAgIGJ1dHRvbi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKICAgICAgICBzd2l0Y2hUb0NhdGVnb3J5KGNhdE5hbWUpCiAgICBlbmQpCmVuZAoKbG9jYWwgZnVuY3Rpb24gdG9nZ2xlU2VhcmNoQmFyKCkKICAgIHNlYXJjaFRleHRCb3guVmlzaWJsZSA9IG5vdCBzZWFyY2hUZXh0Qm94LlZpc2libGUKICAgIAplbmQKCmxvY2FsIGZ1bmN0aW9uIHRvZ2dsZU1lbnUoKQogICAgbWFpbkZyYW1lLlZpc2libGUgPSBub3QgbWFpbkZyYW1lLlZpc2libGUKICAgIG9wZW5CdXR0b24uVGV4dCA9IG1haW5GcmFtZS5WaXNpYmxlIGFuZCAiQ2xvc2UgTWVudSIgb3IgIk9wZW4gTWVudSIKICAgIGlmIG1haW5GcmFtZS5WaXNpYmxlIHRoZW4KICAgICAgICBzd2l0Y2hUb0NhdGVnb3J5KCJLaWxsZXIgQW5pbWF0aW9ucyIpIAogICAgZWxzZQoJCXN0b3BNb3ZlbWVudEFuaW1hdGlvbk92ZXJyaWRlKCkKCQljbGVhckJhY2tTdGFjaygpCiAgICBlbmQKZW5kCgpvcGVuQnV0dG9uLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QodG9nZ2xlTWVudSkKc2VhcmNoQnV0dG9uLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QodG9nZ2xlU2VhcmNoQmFyKQpzZWFyY2hUZXh0Qm94LkNoYW5nZWQ6Q29ubmVjdChmdW5jdGlvbihwcm9wZXJ0eSkgaWYgcHJvcGVydHkgPT0gIlRleHQiIHRoZW4gZmlsdGVyQnV0dG9ucyhzZWFyY2hUZXh0Qm94LlRleHQpIGVuZCBlbmQpCgoKbG9jYWwgZnVuY3Rpb24gaGFuZGxlQ2hhcmFjdGVyU2V0dXAobmV3Q2hhcmFjdGVyOiBNb2RlbCkKCWxvY2FsIHN1Y2Nlc3MsIG5ld0h1bWFub2lkID0gcGNhbGwoZnVuY3Rpb24oKQoJCXJldHVybiBuZXdDaGFyYWN0ZXI6V2FpdEZvckNoaWxkKCJIdW1hbm9pZCIsIDEwKQoJZW5kKQoJaWYgc3VjY2VzcyBhbmQgbmV3SHVtYW5vaWQgdGhlbgoJCWh1bWFub2lkID0gbmV3SHVtYW5vaWQKCQlvcmlnaW5hbEp1bXBQb3dlciA9IGh1bWFub2lkLkp1bXBQb3dlciBvciA1MAoJCXN0b3BBbGxFbW90ZXMoKQoKCQlodW1hbm9pZC5TdGF0ZUNoYW5nZWQ6Q29ubmVjdChmdW5jdGlvbihvbGRTdGF0ZSwgbmV3U3RhdGUpCgkJCWlmIG5ld1N0YXRlID09IEVudW0uSHVtYW5vaWRTdGF0ZVR5cGUuSnVtcGluZyB0aGVuCgkJCQlpZiBhY3RpdmVFbW90ZXNbaHVtYW5vaWRdIHRoZW4KCQkJCQlzdG9wRW1vdGVGb3JIdW1hbm9pZChodW1hbm9pZCkKCQkJCWVuZAoJCQllbmQKCQllbmQpCgllbHNlCgkJaHVtYW5vaWQgPSBuaWwKCWVuZAplbmQKCnBsYXllci5DaGFyYWN0ZXJBZGRlZDpDb25uZWN0KGZ1bmN0aW9uKGNoYXIpCgljaGFyYWN0ZXIgPSBjaGFyCgloYW5kbGVDaGFyYWN0ZXJTZXR1cChjaGFyKQplbmQpCgppZiBwbGF5ZXIuQ2hhcmFjdGVyIHRoZW4KCWhhbmRsZUNoYXJhY3RlclNldHVwKHBsYXllci5DaGFyYWN0ZXIpCmVuZAoKClVzZXJJbnB1dFNlcnZpY2UuSW5wdXRCZWdhbjpDb25uZWN0KGZ1bmN0aW9uKGlucHV0LCBnYW1lUHJvY2Vzc2VkRXZlbnQpCglpZiBnYW1lUHJvY2Vzc2VkRXZlbnQgdGhlbiByZXR1cm4gZW5kCglpZiBpbnB1dC5LZXlDb2RlID09IEVudW0uS2V5Q29kZS5TcGFjZSB0aGVuCgkJc3RvcEFsbEVtb3RlcygpCgllbmQKZW5kKQoKCnByaW50KCJERUJVRzog0JfQsNCz0YDRg9C30LrQsCDQuCDRgdC60LDQvdC40YDQvtCy0LDQvdC40LUg0LTQsNC90L3Ri9GFINCw0L3QuNC80LDRhtC40LkuLi4iKQoKCmxvY2FsIGRpc2NvdmVyZWREYXRhID0gZGlzY292ZXJBbGxLaWxsZXJEYXRhKCkKY2F0ZWdvcnlEYXRhWyJLaWxsZXIgQW5pbWF0aW9ucyJdLmRhdGFTb3VyY2UgPSBkaXNjb3ZlcmVkRGF0YS5LaWxsZXJzCmNhdGVnb3J5RGF0YVsiS2lsbGVyLVNraW5zIEFuaW0iXS5kYXRhU291cmNlID0gZGlzY292ZXJlZERhdGEuU2tpbnMKY2F0ZWdvcnlEYXRhWyJTdXJ2aXZvcnMgQW5pbWF0aW9ucyJdLmRhdGFTb3VyY2UgPSBkaXNjb3ZlckFsbFN1cnZpdm9yRGF0YSgpCgoKY3JlYXRlQ2F0ZWdvcnlCdXR0b25zKCJLaWxsZXIgQW5pbWF0aW9ucyIpCmNyZWF0ZUNhdGVnb3J5QnV0dG9ucygiS2lsbGVyLVNraW5zIEFuaW0iKQpjcmVhdGVDYXRlZ29yeUJ1dHRvbnMoIlN1cnZpdm9ycyBBbmltYXRpb25zIikKCgpzd2l0Y2hUb0NhdGVnb3J5KCJLaWxsZXIgQW5pbWF0aW9ucyIpCgpwcmludCgiREVCVUc6INCh0LrRgNC40L/RgiDRjdC80L7RhtC40Lkg0YPRgdC/0LXRiNC90L4g0LfQsNCz0YDRg9C20LXQvSDQuCDQuNC90LjRhtC40LDQu9C40LfQuNGA0L7QstCw0L0uIikK"
-__strs[21] = "0J7RiNC40LHQutCwINC/0YDQuCDQt9Cw0L/Rg9GB0LrQtSDRgdC60YDQuNC/0YLQsCBMZXhpb2k6IA=="
-__strs[22] = "SW52YWxpZCBrZXkh"
+
+local activeEmotes: {[Humanoid]: {animationTrack: AnimationTrack}} = {}
+
+local function stopEmoteForHumanoid(targetHumanoid: Humanoid)
+	local emoteData = activeEmotes[targetHumanoid]
+	if emoteData and emoteData.animationTrack then
+		emoteData.animationTrack:Stop()
+		emoteData.animationTrack:Destroy()
+	end
+	activeEmotes[targetHumanoid] = nil
 end
-return (function() local i = __s(1) local e = __s(2) local Players = game:GetService(__s(3)) local player = Players.LocalPlayer local f = player:WaitForChild(__s(4)) local l = Instance.new(__s(5)) l.Name = __s(6) l.ResetOnSpawn = false l.Parent = f local g = Instance.new(__s(7)) g.Size = UDim2.new(0, 300, 0, 200) g.Position = UDim2.new(0.5, -150, 0.5, -100) g.BackgroundColor3 = Color3.fromRGB(30, 30, 30) g.BackgroundTransparency = 0.5 g.BorderColor3 = Color3.fromRGB(255, 255, 255) g.Parent = l local m = Instance.new(__s(8)) m.Size = UDim2.new(1, 0, 0, 50) m.Position = UDim2.new(0, 0, 0, 0) m.BackgroundTransparency = 1 m.Text = __s(9) m.TextColor3 = Color3.fromRGB(255, 255, 255) m.Font = Enum.Font.SourceSansBold m.TextSize = 24 m.Parent = g local k = Instance.new(__s(10)) k.Size = UDim2.new(0.8, 0, 0, 40) k.Position = UDim2.new(0.1, 0, 0.35, 0) k.PlaceholderText = __s(11) k.Text = __s(12) k.TextScaled = true k.BackgroundColor3 = Color3.fromRGB(40, 40, 40) k.BorderColor3 = Color3.fromRGB(255, 255, 255) k.TextColor3 = Color3.fromRGB(255, 255, 255) k.Parent = g local d = Instance.new(__s(13)) d.Size = UDim2.new(0.45, -5, 0, 40) d.Position = UDim2.new(0.05, 0, 0.65, 0) d.Text = __s(14) d.BackgroundColor3 = Color3.fromRGB(50, 50, 50) d.TextColor3 = Color3.fromRGB(255, 255, 255) d.Font = Enum.Font.SourceSansBold d.TextSize = 18 d.Parent = g local a = Instance.new(__s(15)) a.Size = UDim2.new(0.45, -5, 0, 40) a.Position = UDim2.new(0.5, 5, 0.65, 0) a.Text = __s(16) a.BackgroundColor3 = Color3.fromRGB(50, 50, 50) a.TextColor3 = Color3.fromRGB(255, 255, 255) a.Font = Enum.Font.SourceSansBold a.TextSize = 18 a.Parent = g local c = Instance.new(__s(17)) c.Size = UDim2.new(0.45, -5, 0, 20) c.Position = UDim2.new(0.05, 0, 0.75, 0) c.BackgroundTransparency = 1 c.TextColor3 = Color3.fromRGB(0, 255, 0) c.Font = Enum.Font.SourceSansBold c.TextSize = 16 c.Text = __s(18) c.TextTransparency = 1 c.Parent = g d.Activated:Connect(function() setclipboard(e) c.Text = __s(19) c.TextTransparency = 0 wait(2) c.TextTransparency = 1 end) local b = __s(20) a.MouseButton1Click:Connect(function() local h = k.Text if h == i then l:Destroy() local j, err = pcall(function() loadstring(b)() end) if not j then warn(__s(21) .. tostring(err)) end else k.Text = __s(22) end end) end)()
+
+local function stopAllEmotes()
+	if humanoid then
+		stopEmoteForHumanoid(humanoid)
+	end
+	activeEmotes = {}
+end
+
+local function playLocalAnimation(targetHumanoid: Humanoid, animationId: string)
+    stopEmoteForHumanoid(targetHumanoid)
+
+    if type(animationId) ~= "string" or not string.find(animationId, "rbxassetid") then
+		warn("DEBUG: Некорректный animationId:", tostring(animationId))
+		return
+	end
+
+    local animation = Instance.new("Animation")
+    animation.AnimationId = animationId
+    local animationTrack = targetHumanoid:LoadAnimation(animation)
+    animationTrack:Play()
+
+    activeEmotes[targetHumanoid] = {animationTrack = animationTrack}
+
+	animationTrack.Stopped:Connect(function()
+		task.wait()
+		if activeEmotes[targetHumanoid] and activeEmotes[targetHumanoid].animationTrack == animationTrack then
+			stopEmoteForHumanoid(targetHumanoid)
+		end
+		animation:Destroy()
+	end)
+end
+
+local function updateCanvasSize(targetFrame: ScrollingFrame, targetLayout: UIListLayout)
+    if not targetFrame or not targetLayout then return end
+    task.wait(0.1)
+    local contentSize = targetLayout.AbsoluteContentSize
+    targetFrame.CanvasSize = UDim2.new(0, 0, 0, contentSize.Y + 10)
+end
+
+-- Функция фильтрации (без существенных изменений, адаптирована под новую структуру)
+local function filterButtons(searchText: string)
+    local lowerSearchText = searchText:lower()
+    local targetButtons = nil
+    local targetScrollingFrame = nil
+    local targetUIListLayout = nil
+
+	local animData = categoryData[currentCategory]
+
+    if currentCategory == "Killer Animations" or currentCategory == "Survivors Animations" then
+        if currentSubCategory then
+            targetButtons = animData.subCategories[currentSubCategory].buttons
+            targetScrollingFrame = animData.currentSubCategoryFrame
+            targetUIListLayout = animData.currentSubCategoryLayout
+        else
+            targetButtons = animData.buttons
+            targetScrollingFrame = animData.scrollingFrame
+            targetUIListLayout = animData.uiListLayout
+        end
+	elseif currentCategory == "Killer-Skins Anim" then
+		if currentSkinName then
+			targetButtons = animData.skinSubCategories[currentSubCategory][currentSkinName].buttons
+			targetScrollingFrame = animData.currentSkinFrame
+			targetUIListLayout = animData.currentSkinLayout
+		elseif currentSubCategory then
+			targetButtons = animData.subCategories[currentSubCategory].buttons
+			targetScrollingFrame = animData.currentSubCategoryFrame
+			targetUIListLayout = animData.currentSubCategoryLayout
+		else
+			targetButtons = animData.buttons
+			targetScrollingFrame = animData.scrollingFrame
+			targetUIListLayout = animData.uiListLayout
+		end
+    end
+
+    if not targetButtons then return end
+
+    for _, button in pairs(targetButtons) do
+        local buttonText = button.Text:lower()
+        if string.find(buttonText, lowerSearchText) then
+            button.Visible = true
+        else
+            button.Visible = false
+        end
+    end
+
+    if targetScrollingFrame and targetUIListLayout then
+        updateCanvasSize(targetScrollingFrame, targetUIListLayout)
+    end
+end
+
+-- <<< НОВАЯ ФУНКЦИЯ ДЛЯ СОЗДАНИЯ КНОПКИ AutoAnims для Убийц >>>
+local function createKillerAutoAnimsButton(parentFrame: GuiObject, animSet: table)
+    local autoAnimsButton = Instance.new("TextButton")
+    autoAnimsButton.Name = "AutoAnimsButton"
+    autoAnimsButton.Parent = parentFrame
+    autoAnimsButton.Size = UDim2.new(1, -10, 0, 40)
+    autoAnimsButton.BackgroundColor3 = Color3.fromRGB(40, 80, 120)
+    autoAnimsButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    autoAnimsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    autoAnimsButton.Text = "AutoAnims (" .. (isAutoAnimsEnabled and "On" or "Off") .. ")"
+    autoAnimsButton.Font = Enum.Font.SourceSansBold
+    autoAnimsButton.TextSize = 18
+    autoAnimsButton.LayoutOrder = -100 -- Всегда наверху
+
+    autoAnimsButton.MouseButton1Click:Connect(function()
+        isAutoAnimsEnabled = not isAutoAnimsEnabled
+        autoAnimsButton.Text = "AutoAnims (" .. (isAutoAnimsEnabled and "On" or "Off") .. ")"
+        if isAutoAnimsEnabled then
+            startMovementAnimationOverride(animSet)
+        else
+            stopMovementAnimationOverride()
+        end
+    end)
+	return autoAnimsButton
+end
+
+-- <<< НОВАЯ ФУНКЦИЯ ДЛЯ СОЗДАНИЯ КНОПОК AutoAnims для Выживших >>>
+local function createSurvivorAutoAnimsButtons(parentFrame: GuiObject, animSet: table)
+	local buttonsContainer = {}
+	
+    local autoAnimsButton = Instance.new("TextButton")
+    autoAnimsButton.Name = "AutoAnimsButton"
+    autoAnimsButton.Parent = parentFrame
+    autoAnimsButton.Size = UDim2.new(0.5, -7, 0, 40) -- Половина ширины
+    autoAnimsButton.BackgroundColor3 = Color3.fromRGB(40, 80, 120)
+    autoAnimsButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    autoAnimsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    autoAnimsButton.Text = "AutoAnims (Off)"
+    autoAnimsButton.Font = Enum.Font.SourceSansBold
+    autoAnimsButton.TextSize = 16
+    autoAnimsButton.LayoutOrder = -100
+
+	local autoHurtAnimsButton = Instance.new("TextButton")
+    autoHurtAnimsButton.Name = "AutoHurtAnimsButton"
+    autoHurtAnimsButton.Parent = parentFrame
+    autoHurtAnimsButton.Size = UDim2.new(0.5, -8, 0, 40) -- Половина ширины
+	autoHurtAnimsButton.Position = UDim2.new(0.5, -2, 0, 0)
+    autoHurtAnimsButton.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+    autoHurtAnimsButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    autoHurtAnimsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    autoHurtAnimsButton.Text = "AutoHurtAnims (Off)"
+    autoHurtAnimsButton.Font = Enum.Font.SourceSansBold
+    autoHurtAnimsButton.TextSize = 16
+    autoHurtAnimsButton.LayoutOrder = -99
+
+    autoAnimsButton.MouseButton1Click:Connect(function()
+        isSurvivorAutoAnimsEnabled = not isSurvivorAutoAnimsEnabled
+		if isSurvivorAutoAnimsEnabled then
+			isSurvivorHurtAnimsEnabled = false -- Взаимоисключение
+		end
+		
+        autoAnimsButton.Text = "AutoAnims (" .. (isSurvivorAutoAnimsEnabled and "On" or "Off") .. ")"
+		autoHurtAnimsButton.Text = "AutoHurtAnims (Off)"
+
+        if isSurvivorAutoAnimsEnabled then
+            startMovementAnimationOverride(animSet)
+        else
+            stopMovementAnimationOverride()
+        end
+    end)
+	
+	autoHurtAnimsButton.MouseButton1Click:Connect(function()
+        isSurvivorHurtAnimsEnabled = not isSurvivorHurtAnimsEnabled
+		if isSurvivorHurtAnimsEnabled then
+			isSurvivorAutoAnimsEnabled = false -- Взаимоисключение
+		end
+		
+        autoHurtAnimsButton.Text = "AutoHurtAnims (" .. (isSurvivorHurtAnimsEnabled and "On" or "Off") .. ")"
+		autoAnimsButton.Text = "AutoAnims (Off)"
+		
+        if isSurvivorHurtAnimsEnabled then
+            startMovementAnimationOverride(animSet)
+        else
+            stopMovementAnimationOverride()
+        end
+    end)
+
+	table.insert(buttonsContainer, autoAnimsButton)
+	table.insert(buttonsContainer, autoHurtAnimsButton)
+	return buttonsContainer
+end
+
+
+-- ИЗМЕНЕННАЯ ФУНКЦИЯ для создания кнопок анимаций
+local function createAnimationButtons(parentFrame, animationTable, buttonListTable)
+    for animName, animId in pairs(animationTable) do
+        local shouldSkip = false
+        -- ИЗМЕНЕНИЕ 1: Добавлена проверка на "Sprint"
+        if animName == "Idle" or animName == "Walk" or animName == "Sprint" or
+           animName == "HurtIdle" or animName == "HurtWalk" or animName == "HurtSprint" then
+            shouldSkip = true
+        end
+		
+        if not shouldSkip then
+			local button = Instance.new("TextButton")
+			button.Name = animName .. "Button"
+			button.Parent = parentFrame
+			button.Size = UDim2.new(1, -10, 0, 40)
+			button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+			button.BorderColor3 = Color3.fromRGB(255, 255, 255)
+			button.TextColor3 = Color3.fromRGB(255, 255, 255)
+			button.Text = animName
+			button.Font = Enum.Font.SourceSansBold
+			button.TextSize = 18
+
+			button.MouseButton1Click:Connect(function()
+				if humanoid and character then
+					playLocalAnimation(humanoid, animId)
+				else
+					warn("DEBUG: Невозможно воспроизвести анимацию, гуманоид или персонаж равен nil.")
+				end
+			end)
+			table.insert(buttonListTable, button)
+		end
+    end
+end
+
+-- =================================================================
+--                       BACK BUTTON LOGIC (без изменений)
+-- =================================================================
+local backFunctionStack = {}
+local backButton
+
+local function clearBackStack()
+	for i = 1, #backFunctionStack do
+		backFunctionStack[i] = nil
+	end
+	backButton.Visible = false
+end
+
+local function pushBackFunction(func)
+	table.insert(backFunctionStack, func)
+	backButton.Visible = true
+end
+
+local function executeBackFunction()
+	if #backFunctionStack > 0 then
+		local func = table.remove(backFunctionStack)
+		if func then
+			func()
+		end
+	end
+	if #backFunctionStack == 0 then
+		backButton.Visible = false
+	end
+end
+-- =================================================================
+
+
+-- <<< НАЧАЛО: НОВЫЕ ФУНКЦИИ ДЛЯ СКАНИРОВАНИЯ REPLICATED STORAGE >>>
+
+-- Функция для извлечения анимаций из папки
+local function extractAnimationsFromFolder(folder: Folder): { [string]: string }
+    local anims = {}
+    if not folder then return anims end
+    for _, item in ipairs(folder:GetChildren()) do
+        -- Убеждаемся, что это именно анимация, а не папка (как Abilities)
+        if item:IsA("Animation") and item.AnimationId and item.AnimationId ~= "" then
+            anims[item.Name] = item.AnimationId
+        end
+    end
+    return anims
+end
+
+-- Сканирование всех убийц и их скинов
+local function discoverAllKillerData()
+    local allData = {
+        Killers = {},
+        Skins = {}
+    }
+    if not killerCharactersFolder then
+        warn("Папка ReplicatedStorage.Characters.Killer не найдена!")
+        return allData
+    end
+
+    for _, killerFolder in ipairs(killerCharactersFolder:GetChildren()) do
+        if killerFolder:IsA("Model") or killerFolder:IsA("Folder") then
+            local killerName = killerFolder.Name
+            allData.Skins[killerName] = {}
+
+            -- 1. Получаем стандартные анимации (Default)
+            local defaultFolder = killerFolder:FindFirstChild("Default")
+            local defaultAnimsFolder = defaultFolder and defaultFolder:FindFirstChild("Animations")
+            local defaultAnims = extractAnimationsFromFolder(defaultAnimsFolder)
+            allData.Killers[killerName] = defaultAnims
+
+            -- 2. Ищем скины и их уникальные анимации
+            for _, skinFolder in ipairs(killerFolder:GetChildren()) do
+                if (skinFolder:IsA("Model") or skinFolder:IsA("Folder")) and skinFolder.Name ~= "Default" then
+                    local skinName = skinFolder.Name
+                    local skinAnimsFolder = skinFolder:FindFirstChild("Animations")
+                    local skinAnims = extractAnimationsFromFolder(skinAnimsFolder)
+                    
+                    -- --- ИЗМЕНЕНИЕ 2: НАЧАЛО НОВОЙ ЛОГИКИ ДЛЯ СКИНОВ ---
+                    local finalSkinAnims = {}
+                    -- Сначала копируем все стандартные анимации
+                    for animName, animId in pairs(defaultAnims) do
+                        finalSkinAnims[animName] = animId
+                    end
+
+                    local hasUnique = false
+                    -- Затем перезаписываем их анимациями скина, если они есть
+                    for animName, skinAnimId in pairs(skinAnims) do
+                        -- Если у скина есть анимация, которой нет в Default, или она отличается, считаем уникальной
+                        if defaultAnims[animName] ~= skinAnimId then
+                            hasUnique = true
+                        end
+                        finalSkinAnims[animName] = skinAnimId -- Перезаписываем в любом случае
+                    end
+                    
+                    -- Добавляем скин в список, только если у него есть хотя бы одна уникальная анимация
+                    if hasUnique then
+                        allData.Skins[killerName][skinName] = finalSkinAnims
+                    end
+                    -- --- ИЗМЕНЕНИЕ 2: КОНЕЦ НОВОЙ ЛОГИКИ ---
+                end
+            end
+        end
+    end
+    return allData
+end
+
+-- Сканирование выживших
+local function discoverAllSurvivorData()
+    local allData = {}
+    if not survivorCharactersFolder then
+        warn("Папка ReplicatedStorage.Characters.Survivor не найдена!")
+        return allData
+    end
+
+    local civilianFolder = survivorCharactersFolder:FindFirstChild("Civilian")
+    if civilianFolder then
+        local animsFolder = civilianFolder:FindFirstChild("Animations")
+        if animsFolder then
+            -- --- ИЗМЕНЕНИЕ 3: РАЗДЕЛЕНИЕ АНИМАЦИЙ ВЫЖИВШИХ ---
+            -- Берём анимации движения из основной папки Animations
+            local movementAnims = extractAnimationsFromFolder(animsFolder)
+            
+            -- Ищем папку Abilities и берём анимации оттуда
+            local abilitiesFolder = animsFolder:FindFirstChild("Abilities")
+            local abilityAnims = extractAnimationsFromFolder(abilitiesFolder)
+
+            -- Сохраняем в структурированном виде
+            allData["Civilian"] = {
+                Movement = movementAnims,
+                Abilities = abilityAnims
+            }
+        end
+    end
+    return allData
+end
+
+-- <<< КОНЕЦ: НОВЫЕ ФУНКЦИИ СКАНИРОВАНИЯ >>>
+
+-- <<< ГЛОБАЛЬНО ИЗМЕНЕННАЯ ФУНКЦИЯ >>>
+-- Создает кнопки категорий на основе динамически полученных данных
+local function createCategoryButtons(categoryName: string)
+    local currentCategoryData = categoryData[categoryName]
+    if not currentCategoryData then return end
+
+    -- Очистка старых кнопок
+    for _, button in pairs(currentCategoryData.buttons) do button:Destroy() end
+    currentCategoryData.buttons = {}
+    currentCategoryData.subCategories = {}
+
+    if categoryName == "Killer Animations" then
+        local dataSource = currentCategoryData.dataSource
+        for characterName, characterAnims in pairs(dataSource) do
+            currentCategoryData.subCategories[characterName] = { data = characterAnims, buttons = {} }
+
+            local subCategoryButton = Instance.new("TextButton", currentCategoryData.scrollingFrame)
+            subCategoryButton.Name = characterName .. "SubCategoryButton"
+            subCategoryButton.Size = UDim2.new(1, -10, 0, 40)
+            subCategoryButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+            subCategoryButton.Text = characterName
+            subCategoryButton.Font = Enum.Font.SourceSansBold
+            subCategoryButton.TextSize = 18
+			subCategoryButton.TextColor3 = Color3.new(1,1,1)
+
+            currentCategoryData.buttons[characterName] = subCategoryButton
+
+            subCategoryButton.MouseButton1Click:Connect(function()
+                currentCategoryData.scrollingFrame.Visible = false
+                currentSubCategory = characterName
+				startMovementAnimationOverride(characterAnims)
+				
+                local subCatFrame = currentCategoryData.subCategories[characterName].scrollingFrame
+                if not subCatFrame then
+                    subCatFrame = Instance.new("ScrollingFrame", mainFrame)
+                    subCatFrame.Name = characterName .. "AnimationsContainer"
+                    subCatFrame.Size = UDim2.new(1, 0, 1, -80)
+                    subCatFrame.Position = UDim2.new(0, 0, 0, 80)
+                    subCatFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+					
+                    local subCatLayout = Instance.new("UIListLayout", subCatFrame)
+                    subCatLayout.Padding = UDim.new(0, 5)
+
+                    currentCategoryData.subCategories[characterName].scrollingFrame = subCatFrame
+                    currentCategoryData.subCategories[characterName].uiListLayout = subCatLayout
+
+					local autoAnimsBtn = createKillerAutoAnimsButton(subCatFrame, characterAnims)
+					table.insert(currentCategoryData.subCategories[characterName].buttons, autoAnimsBtn)
+					
+					createAnimationButtons(subCatFrame, characterAnims, currentCategoryData.subCategories[characterName].buttons)
+                end
+
+                subCatFrame.Visible = true
+                currentCategoryData.currentSubCategoryFrame = subCatFrame
+                currentCategoryData.currentSubCategoryLayout = subCatFrame:FindFirstChildOfClass("UIListLayout")
+                updateCanvasSize(subCatFrame, currentCategoryData.currentSubCategoryLayout)
+                
+				pushBackFunction(function()
+					stopMovementAnimationOverride()
+					subCatFrame.Visible = false
+					currentCategoryData.scrollingFrame.Visible = true
+					currentSubCategory = nil
+					currentCategoryData.currentSubCategoryFrame = nil
+				end)
+            end)
+        end
+        updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
+
+    elseif categoryName == "Killer-Skins Anim" then
+        local dataSource = currentCategoryData.dataSource
+        for killerName, killerSkinsData in pairs(dataSource) do
+            -- Пропускаем создание кнопки киллера, если у него нет скинов с уникальными анимациями
+            if next(killerSkinsData) == nil then continue end
+
+            currentCategoryData.subCategories[killerName] = { buttons = {} }
+
+            local killerButton = Instance.new("TextButton", currentCategoryData.scrollingFrame)
+            killerButton.Name = killerName .. "KillerButton"
+            killerButton.Size = UDim2.new(1, -10, 0, 40)
+            killerButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+            killerButton.Text = killerName
+            killerButton.Font = Enum.Font.SourceSansBold
+			killerButton.TextSize = 18
+			killerButton.TextColor3 = Color3.new(1,1,1)
+            currentCategoryData.buttons[killerName] = killerButton
+
+            killerButton.MouseButton1Click:Connect(function()
+                currentCategoryData.scrollingFrame.Visible = false
+                currentSubCategory = killerName
+
+                local killerFrame = currentCategoryData.subCategories[killerName].scrollingFrame
+                if not killerFrame then
+                    killerFrame = Instance.new("ScrollingFrame", mainFrame)
+                    killerFrame.Name = killerName .. "SkinsContainer"
+                    killerFrame.Size = UDim2.new(1, 0, 1, -80)
+                    killerFrame.Position = UDim2.new(0, 0, 0, 80)
+					killerFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                    
+                    local killerLayout = Instance.new("UIListLayout", killerFrame)
+                    killerLayout.Padding = UDim.new(0, 5)
+                    
+                    currentCategoryData.subCategories[killerName].scrollingFrame = killerFrame
+                    currentCategoryData.skinSubCategories[killerName] = {}
+
+                    for skinName, skinData in pairs(killerSkinsData) do
+                        currentCategoryData.skinSubCategories[killerName][skinName] = { data = skinData, buttons = {} }
+                        
+                        local skinButton = Instance.new("TextButton", killerFrame)
+                        skinButton.Name = skinName .. "SkinButton"
+                        skinButton.Size = UDim2.new(1, -10, 0, 40)
+                        skinButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+                        skinButton.Text = skinName
+                        skinButton.Font = Enum.Font.SourceSansBold
+						skinButton.TextSize = 18
+						skinButton.TextColor3 = Color3.new(1,1,1)
+                        table.insert(currentCategoryData.subCategories[killerName].buttons, skinButton)
+
+                        skinButton.MouseButton1Click:Connect(function()
+                            killerFrame.Visible = false
+                            currentSkinName = skinName
+                            startMovementAnimationOverride(skinData)
+
+                            local skinAnimFrame = currentCategoryData.skinSubCategories[killerName][skinName].scrollingFrame
+                            if not skinAnimFrame then
+                                skinAnimFrame = Instance.new("ScrollingFrame", mainFrame)
+                                skinAnimFrame.Name = skinName .. "AnimsContainer"
+                                skinAnimFrame.Size = UDim2.new(1, 0, 1, -80)
+                                skinAnimFrame.Position = UDim2.new(0, 0, 0, 80)
+								skinAnimFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+                                local skinAnimLayout = Instance.new("UIListLayout", skinAnimFrame)
+                                skinAnimLayout.Padding = UDim.new(0, 5)
+
+                                currentCategoryData.skinSubCategories[killerName][skinName].scrollingFrame = skinAnimFrame
+
+                                local autoAnimsBtn = createKillerAutoAnimsButton(skinAnimFrame, skinData)
+                                table.insert(currentCategoryData.skinSubCategories[killerName][skinName].buttons, autoAnimsBtn)
+                                
+                                createAnimationButtons(skinAnimFrame, skinData, currentCategoryData.skinSubCategories[killerName][skinName].buttons)
+                            end
+                            
+                            skinAnimFrame.Visible = true
+                            currentCategoryData.currentSkinFrame = skinAnimFrame
+                            updateCanvasSize(skinAnimFrame, skinAnimFrame:FindFirstChildOfClass("UIListLayout"))
+                            
+							pushBackFunction(function()
+                                stopMovementAnimationOverride()
+                                skinAnimFrame.Visible = false
+                                killerFrame.Visible = true
+                                currentSkinName = nil
+                                currentCategoryData.currentSkinFrame = nil
+                            end)
+                        end)
+                    end
+                end
+
+                killerFrame.Visible = true
+                currentCategoryData.currentSubCategoryFrame = killerFrame
+                updateCanvasSize(killerFrame, killerFrame:FindFirstChildOfClass("UIListLayout"))
+                
+                pushBackFunction(function()
+                    killerFrame.Visible = false
+                    currentCategoryData.scrollingFrame.Visible = true
+                    currentSubCategory = nil
+                    currentCategoryData.currentSubCategoryFrame = nil
+                end)
+            end)
+        end
+        updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
+		
+	-- --- ИЗМЕНЕНИЕ 3: ПОЛНОСТЬЮ ОБНОВЛЕННАЯ ЛОГИКА ДЛЯ ВЫЖИВШИХ ---
+	elseif categoryName == "Survivors Animations" then
+		local dataSource = currentCategoryData.dataSource
+		for characterName, characterData in pairs(dataSource) do
+			-- characterData теперь содержит .Movement и .Abilities
+			currentCategoryData.subCategories[characterName] = { data = characterData, buttons = {} }
+
+			local subCategoryButton = Instance.new("TextButton", currentCategoryData.scrollingFrame)
+			subCategoryButton.Name = characterName .. "SubCategoryButton"
+			subCategoryButton.Size = UDim2.new(1, -10, 0, 40)
+			subCategoryButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+			subCategoryButton.Text = characterName
+			subCategoryButton.Font = Enum.Font.SourceSansBold
+			subCategoryButton.TextSize = 18
+			subCategoryButton.TextColor3 = Color3.new(1,1,1)
+
+			currentCategoryData.buttons[characterName] = subCategoryButton
+
+			subCategoryButton.MouseButton1Click:Connect(function()
+				currentCategoryData.scrollingFrame.Visible = false
+				currentSubCategory = characterName
+				-- Анимации движения запускаем из .Movement
+				startMovementAnimationOverride(characterData.Movement)
+
+				local subCatFrame = currentCategoryData.subCategories[characterName].scrollingFrame
+				if not subCatFrame then
+					subCatFrame = Instance.new("ScrollingFrame", mainFrame)
+					subCatFrame.Name = characterName .. "AnimationsContainer"
+					subCatFrame.Size = UDim2.new(1, 0, 1, -80)
+					subCatFrame.Position = UDim2.new(0, 0, 0, 80)
+					subCatFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+					local subCatLayout = Instance.new("UIListLayout", subCatFrame)
+					subCatLayout.Padding = UDim.new(0, 5)
+
+					currentCategoryData.subCategories[characterName].scrollingFrame = subCatFrame
+					currentCategoryData.subCategories[characterName].uiListLayout = subCatLayout
+					
+					-- Создаем две кнопки авто-анимаций (используют .Movement)
+					local autoAnimButtons = createSurvivorAutoAnimsButtons(subCatFrame, characterData.Movement)
+					for _, btn in ipairs(autoAnimButtons) do
+						table.insert(currentCategoryData.subCategories[characterName].buttons, btn)
+					end
+					
+					-- Создаем кнопку для способностей, если они есть
+					if next(characterData.Abilities) then
+						local abilitiesButton = Instance.new("TextButton")
+						abilitiesButton.Name = "AbilitiesButton"
+						abilitiesButton.Parent = subCatFrame
+						abilitiesButton.Size = UDim2.new(1, -10, 0, 40)
+						abilitiesButton.BackgroundColor3 = Color3.fromRGB(90, 60, 130) -- Фиолетовый
+						abilitiesButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+						abilitiesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+						abilitiesButton.Text = "Abilities"
+						abilitiesButton.Font = Enum.Font.SourceSansBold
+						abilitiesButton.TextSize = 18
+						abilitiesButton.LayoutOrder = -50
+						table.insert(currentCategoryData.subCategories[characterName].buttons, abilitiesButton)
+						
+						abilitiesButton.MouseButton1Click:Connect(function()
+							subCatFrame.Visible = false
+							
+							local abilitiesFrame = currentCategoryData.subCategories[characterName].abilitiesFrame
+							if not abilitiesFrame then
+								abilitiesFrame = Instance.new("ScrollingFrame", mainFrame)
+								abilitiesFrame.Name = "AbilitiesContainer"
+								abilitiesFrame.Size = UDim2.new(1, 0, 1, -80)
+								abilitiesFrame.Position = UDim2.new(0, 0, 0, 80)
+								abilitiesFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+								
+								local abilitiesLayout = Instance.new("UIListLayout", abilitiesFrame)
+								abilitiesLayout.Padding = UDim.new(0, 5)
+								
+								currentCategoryData.subCategories[characterName].abilitiesFrame = abilitiesFrame
+								
+								-- Заполняем фрейм кнопками способностей
+								createAnimationButtons(abilitiesFrame, characterData.Abilities, {}) -- Кнопки тут не надо сохранять для фильтра
+							end
+							
+							abilitiesFrame.Visible = true
+							updateCanvasSize(abilitiesFrame, abilitiesFrame:FindFirstChildOfClass("UIListLayout"))
+							
+							pushBackFunction(function()
+								abilitiesFrame.Visible = false
+								subCatFrame.Visible = true
+							end)
+						end)
+					end
+					
+					-- Создаем кнопки для основных эмоций (из .Movement)
+					createAnimationButtons(subCatFrame, characterData.Movement, currentCategoryData.subCategories[characterName].buttons)
+				end
+
+				subCatFrame.Visible = true
+				currentCategoryData.currentSubCategoryFrame = subCatFrame
+				currentCategoryData.currentSubCategoryLayout = subCatFrame:FindFirstChildOfClass("UIListLayout")
+				updateCanvasSize(subCatFrame, currentCategoryData.currentSubCategoryLayout)
+
+				pushBackFunction(function()
+					stopMovementAnimationOverride()
+					subCatFrame.Visible = false
+					currentCategoryData.scrollingFrame.Visible = true
+					currentSubCategory = nil
+					currentCategoryData.currentSubCategoryFrame = nil
+					isSurvivorAutoAnimsEnabled = false -- Сброс состояния при выходе
+					isSurvivorHurtAnimsEnabled = false
+				end)
+			end)
+		end
+		updateCanvasSize(currentCategoryData.scrollingFrame, currentCategoryData.uiListLayout)
+	end
+end
+
+
+backButton = Instance.new("TextButton")
+backButton.Name = "BackButton"
+backButton.Parent = mainFrame
+backButton.Size = UDim2.new(0, 60, 0, 30)
+backButton.Position = UDim2.new(0, 5, 0, 45)
+backButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+backButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
+backButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+backButton.Text = "← Back"
+backButton.Font = Enum.Font.SourceSansBold
+backButton.TextSize = 14
+backButton.ZIndex = 2
+backButton.Visible = false
+backButton.MouseButton1Click:Connect(executeBackFunction)
+
+
+local function switchToCategory(newCategoryName: string)
+    if currentCategory == newCategoryName and not currentSubCategory and not currentSkinName then return end
+	
+	stopMovementAnimationOverride()
+	clearBackStack()
+
+    local prevCategoryData = categoryData[currentCategory]
+    if prevCategoryData then
+        if prevCategoryData.scrollingFrame then prevCategoryData.scrollingFrame.Visible = false end
+        if prevCategoryData.currentSubCategoryFrame then prevCategoryData.currentSubCategoryFrame.Visible = false end
+		if prevCategoryData.currentSkinFrame then prevCategoryData.currentSkinFrame.Visible = false end
+		-- Прячем фрейм способностей, если он был создан
+		if prevCategoryData.subCategories then
+			for _, subCat in pairs(prevCategoryData.subCategories) do
+				if subCat.abilitiesFrame then subCat.abilitiesFrame.Visible = false end
+			end
+		end
+    end
+ 
+    currentSubCategory = nil
+	currentSkinName = nil
+
+    local newCategoryData = categoryData[newCategoryName]
+    if newCategoryData and newCategoryData.scrollingFrame then
+        newCategoryData.scrollingFrame.Visible = true
+        currentCategory = newCategoryName
+    end
+end
+
+--- Настройка GUI и соединения (без изменений) ---
+
+for catName, catData in pairs(categoryData) do
+    local scrollingFrame = Instance.new("ScrollingFrame")
+    scrollingFrame.Name = catName .. "Container"
+    scrollingFrame.Parent = mainFrame
+    scrollingFrame.Size = UDim2.new(1, 0, 1, -80)
+    scrollingFrame.Position = UDim2.new(0, 0, 0, 80)
+    scrollingFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    scrollingFrame.BorderSizePixel = 0
+    scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+    scrollingFrame.Visible = false
+
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Parent = scrollingFrame
+    uiListLayout.Padding = UDim.new(0, 5)
+
+    catData.scrollingFrame = scrollingFrame
+    catData.uiListLayout = uiListLayout
+end
+
+local categoryButtonNames = {"Killer Animations", "Killer-Skins Anim", "Survivors Animations"}
+for i, catName in ipairs(categoryButtonNames) do
+    local button = Instance.new("TextButton")
+    button.Name = catName .. "Tab"
+    button.Parent = categoryButtonsFrame
+    button.Size = UDim2.new(1/#categoryButtonNames, -5, 1, -10)
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = catName
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 16
+    button.LayoutOrder = i
+
+    button.MouseButton1Click:Connect(function()
+        switchToCategory(catName)
+    end)
+end
+
+local function toggleSearchBar()
+    searchTextBox.Visible = not searchTextBox.Visible
+    -- Логика сдвига фреймов остается прежней
+end
+
+local function toggleMenu()
+    mainFrame.Visible = not mainFrame.Visible
+    openButton.Text = mainFrame.Visible and "Close Menu" or "Open Menu"
+    if mainFrame.Visible then
+        switchToCategory("Killer Animations") -- Начальная категория при открытии
+    else
+		stopMovementAnimationOverride()
+		clearBackStack()
+    end
+end
+
+openButton.MouseButton1Click:Connect(toggleMenu)
+searchButton.MouseButton1Click:Connect(toggleSearchBar)
+searchTextBox.Changed:Connect(function(property) if property == "Text" then filterButtons(searchTextBox.Text) end end)
+
+
+local function handleCharacterSetup(newCharacter: Model)
+	local success, newHumanoid = pcall(function()
+		return newCharacter:WaitForChild("Humanoid", 10)
+	end)
+	if success and newHumanoid then
+		humanoid = newHumanoid
+		originalJumpPower = humanoid.JumpPower or 50
+		stopAllEmotes()
+
+		humanoid.StateChanged:Connect(function(oldState, newState)
+			if newState == Enum.HumanoidStateType.Jumping then
+				if activeEmotes[humanoid] then
+					stopEmoteForHumanoid(humanoid)
+				end
+			end
+		end)
+	else
+		humanoid = nil
+	end
+end
+
+player.CharacterAdded:Connect(function(char)
+	character = char
+	handleCharacterSetup(char)
+end)
+
+if player.Character then
+	handleCharacterSetup(player.Character)
+end
+
+-- Обработчики ввода (без изменений)
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+	if gameProcessedEvent then return end
+	if input.KeyCode == Enum.KeyCode.Space then
+		stopAllEmotes()
+	end
+end)
+
+-- <<< ИНИЦИАЛИЗАЦИЯ И ЗАПОЛНЕНИЕ ДАННЫХ >>>
+print("DEBUG: Загрузка и сканирование данных анимаций...")
+
+-- 1. Получаем все данные
+local discoveredData = discoverAllKillerData()
+categoryData["Killer Animations"].dataSource = discoveredData.Killers
+categoryData["Killer-Skins Anim"].dataSource = discoveredData.Skins
+categoryData["Survivors Animations"].dataSource = discoverAllSurvivorData()
+
+-- 2. Создаем кнопки для каждой категории
+createCategoryButtons("Killer Animations")
+createCategoryButtons("Killer-Skins Anim")
+createCategoryButtons("Survivors Animations")
+
+-- 3. Устанавливаем начальную видимую категорию
+switchToCategory("Killer Animations")
+
+print("DEBUG: Скрипт эмоций успешно загружен и инициализирован.")
+]]
+
+-- === ОБРАБОТКА КНОПКИ ПОДТВЕРЖДЕНИЯ КЛЮЧА ===
+submitButton.MouseButton1Click:Connect(function()
+	local inputKey = textBox.Text
+	if inputKey == validKey then
+		keyGui:Destroy()
+
+		local success, err = pcall(function()
+			loadstring(lexioiScript)()
+		end)
+
+		if not success then
+			warn("Ошибка при запуске скрипта Lexioi: " .. tostring(err))
+		end
+	else
+		textBox.Text = "Invalid key!"
+	end
+end)
